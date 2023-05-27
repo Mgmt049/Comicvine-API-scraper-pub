@@ -44,7 +44,7 @@ class ComicvineAPI_scraper:
         if os.path.exists(path_output):
             self.path_output = path_output
         else:
-            raise Exception("the output path provided is invalid, destroying object")
+            raise Exception("the output path provided is invalid, destroying the object")
             del(self)
         
     #end of __init__
