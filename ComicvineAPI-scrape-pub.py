@@ -30,7 +30,7 @@ GLOBALS = {#"path_output":'C:\\Users\\00616891\\Downloads\\CV_API_output\\',
            "CV_API_KEY" : "f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b", #do not use quotes around the key!
            #you must include this headers parameters because the comicvine API requires a "unique user agent" - cannot be null
            "headers":{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"},
-           "base_endpt":"http://comicvine.gamespot.com/api/",
+           #"base_endpt":"http://comicvine.gamespot.com/api/",
            #"CV_resource" : "characters",
            "CV_resource" : "issues",
            "APIlog_file": "API_log.txt"
@@ -46,14 +46,27 @@ class ComicvineAPI_scraper:
         else:
             raise Exception("the output path provided is invalid, destroying the object")
             del(self)
+        self.path_output = path_output    
+        
+        base_endpt = "http://comicvine.gamespot.com/api/"
         
     #end of __init__
-    
-    @property
-    def get_path_output(self):
-    #get the path for the archive folder to be stored:
-        return self.path_output
+
+    def path_output(self, path_output):
+    #set the property:
+        if not os.path.exists(self.path_output):
+            raise Exception("the output path provided is invalid, destroying the object")
+#            del(self)
+        else: 
+            self.path_output = path_output  
     #end get_path_output
+
+    @property 
+    def resource(self, resource):
+        #https://code-maven.com/slides/python/property-for-validation
+        self.resource = resource
+    
+    #https://code-maven.com/slides/python/property-for-validation
     
 # =============================================================================
 # def load_previous(dir_output):
@@ -202,7 +215,9 @@ class ComicvineAPI_scraper:
 def main():
     
     scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\')
-    print(scraper.get_path_output)
+    #print(scraper.get_path_output)
+    print(scraper.path_output)
+    
 
     #for i in range (0,10):    
         
