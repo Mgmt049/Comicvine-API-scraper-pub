@@ -71,7 +71,8 @@ class ComicvineAPI_scraper:
     
     @CV_API_KEY.setter 
     def CV_API_KEY(self, CV_API_KEY):
-        #NOTE: add some validation
+        #=======
+        #ACTION: put in a validation
         print("CV_API_KEY setter was called")
         self._CV_API_KEY = CV_API_KEY
         
