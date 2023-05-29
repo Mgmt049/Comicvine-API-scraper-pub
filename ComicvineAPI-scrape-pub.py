@@ -25,48 +25,63 @@ import time
 ## "CV_API_KEY" - sign up for comicvine API and paste in your API key
 #############################################################################################
 
-#ACTION: DO THIS https://towardsdatascience.com/6-approaches-to-validate-class-attributes-in-python-b51cffb8c4ea
-GLOBALS = {#"path_output":'C:\\Users\\00616891\\Downloads\\CV_API_output\\',
-           "CV_API_KEY" : "f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b", #do not use quotes around the key!
-           #you must include this headers parameters because the comicvine API requires a "unique user agent" - cannot be null
-           "headers":{"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"},
-           #"base_endpt":"http://comicvine.gamespot.com/api/",
-           #"CV_resource" : "characters",
-           "CV_resource" : "issues",
-           "APIlog_file": "API_log.txt"
-           }
 #############################################################################################
 
 class ComicvineAPI_scraper:
+#Class variables:
+    base_endpt = "http://comicvine.gamespot.com/api/"
+    #you must include this headers parameters because the comicvine API requires a "unique user agent" - cannot be null
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
+    APIlog_file = "API_log.txt"
+    
     def __init__(self
-                ,path_output):
-        
-        if os.path.exists(path_output):
-            self.path_output = path_output
-        else:
-            raise Exception("the output path provided is invalid, destroying the object")
-            del(self)
-        self.path_output = path_output    
-        
-        base_endpt = "http://comicvine.gamespot.com/api/"
-        
-    #end of __init__
+                ,path_output
+                ,CV_API_KEY
+                ,CV_resource
+                ):
+        self.path_output = path_output
+        self.CV_API_KEY = CV_API_KEY
+        self.CV_resource = CV_resource
 
+    #end of __init__
+    
+    @property 
+    def path_output(self):
+        print("the getter was called \n")
+    #NOTE: you must put an underscore before the instance variable name or else the "getter" will act as a recursive call, throwing a limit error
+        return self._path_output
+    
+    @path_output.setter
     def path_output(self, path_output):
-    #set the property:
-        if not os.path.exists(self.path_output):
+    #this type of setter will always be called upon calling __init__()
+        print("the setter was called \n")
+        if not os.path.exists(path_output):
+        #if not os.path.exists(self._path_output):
             raise Exception("the output path provided is invalid, destroying the object")
 #            del(self)
-        else: 
-            self.path_output = path_output  
-    #end get_path_output
+        self._path_output = path_output
 
+    #https://towardsdatascience.com/6-approaches-to-validate-class-attributes-in-python-b51cffb8c4ea
     @property 
-    def resource(self, resource):
-        #https://code-maven.com/slides/python/property-for-validation
-        self.resource = resource
+    def CV_API_KEY(self):
+        print("CV_API_KEY getter was called")
+        return self._CV_API_KEY
     
-    #https://code-maven.com/slides/python/property-for-validation
+    @CV_API_KEY.setter 
+    def CV_API_KEY(self, CV_API_KEY):
+        print("CV_API_KEY setter was called")
+        self._CV_API_KEY = CV_API_KEY
+        
+    @property 
+    def CV_resource(self):
+        print("CV_resource getter was called")
+        return self._CV_resource
+    
+    @CV_resource.setter 
+    def CV_resource(self, CV_resource):
+        print("CV_API_KEY setter was called")
+        self._CV_resource = CV_resource
+    
     
 # =============================================================================
 # def load_previous(dir_output):
@@ -214,10 +229,8 @@ class ComicvineAPI_scraper:
 
 def main():
     
-    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\')
-    #print(scraper.get_path_output)
-    print(scraper.path_output)
-    
+    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b', 'issues')
+    #print(scraper.get_path_output)    
 
     #for i in range (0,10):    
         
