@@ -38,25 +38,27 @@ class ComicvineAPI_scraper:
                 ,path_output
                 ,CV_API_KEY
                 ,CV_resource
+                ,CV_offset
                 ):
         self.path_output = path_output
         self.CV_API_KEY = CV_API_KEY
         self.CV_resource = CV_resource
+        self.CV_offset = CV_offset  #NOTE: this attribute DOES NOT have its own setter, getter - interesting option
+        self.CV_query_string = "/?api_key="
+        self.resp_format = "&format=json"
+        self.CV_query_URL = None
 
     #end of __init__
     
     @property 
     def path_output(self):
-        print("the getter was called \n")
     #NOTE: you must put an underscore before the instance variable name or else the "getter" will act as a recursive call, throwing a limit error
         return self._path_output
     
     @path_output.setter
     def path_output(self, path_output):
     #this type of setter will always be called upon calling __init__()
-        print("the setter was called \n")
         if not os.path.exists(path_output):
-        #if not os.path.exists(self._path_output):
             raise Exception("the output path provided is invalid, destroying the object")
 #            del(self)
         self._path_output = path_output
@@ -69,19 +71,38 @@ class ComicvineAPI_scraper:
     
     @CV_API_KEY.setter 
     def CV_API_KEY(self, CV_API_KEY):
+        #NOTE: add some validation
         print("CV_API_KEY setter was called")
         self._CV_API_KEY = CV_API_KEY
         
     @property 
     def CV_resource(self):
+        #NOTE: add some validation
         print("CV_resource getter was called")
         return self._CV_resource
     
     @CV_resource.setter 
     def CV_resource(self, CV_resource):
+        valid_resource = (
+            'issues'
+            ,'characters'
+            )
         print("CV_API_KEY setter was called")
+        #validation
+        if CV_resource not in valid_resource:
+            raise Exception("resource parameter provided is invalid, destroying the object")
         self._CV_resource = CV_resource
     
+    @property 
+    def CV_query_URL(self):        
+        print("CV_query_URL getter was called")
+        return self._CV_query_URL
+    
+    @CV_query_URL.setter
+    def CV_query_URL(self, CV_offset):
+        print("CV_query_URL setter was called")
+        #NOTE: add some validation for offset
+        self._CV_query_URL = self.build_query_string()
     
 # =============================================================================
 # def load_previous(dir_output):
@@ -116,20 +137,16 @@ class ComicvineAPI_scraper:
 #             sys.exit() #terminate the whole program
 # 
 # 
-# def build_query_string(base_endpt, offset):
-#     
-#     #CV_resource = "characters"
-#     CV_query_string = "/?api_key="
-#     CV_filter_string = ""
-#     
-#     #https://comicvine.gamespot.com/forums/api-developers-2334/paging-through-results-page-or-offset-1450438/
-#     #The end of the "characters" resource list is around 149150
-#     CV_sort_offset_string = "&sort=name: asc&offset=%s"%(offset)
-#     
-#     resp_format = "&format=json"
-#     #return base_endpt + CV_resource + CV_query_string + CV_API_KEY + CV_filter_string + CV_sort_offset_string + resp_format
-#     return base_endpt + GLOBALS["CV_resource"] + CV_query_string + GLOBALS["CV_API_KEY"] + CV_filter_string + CV_sort_offset_string + resp_format
-# 
+    def build_query_string( self ):
+        
+        CV_filter_string = ""
+        
+        #https://comicvine.gamespot.com/forums/api-developers-2334/paging-through-results-page-or-offset-1450438/
+        #The end of the "characters" resource list is around 149150
+        CV_sort_offset_string = "&sort=name: asc&offset=%s"%(self.CV_offset)
+        
+        return self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
+
 # def normalize_df(json_CV):
 #     
 #     #grab the current date for timestamping
@@ -229,8 +246,9 @@ class ComicvineAPI_scraper:
 
 def main():
     
-    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b', 'issues')
-    #print(scraper.get_path_output)    
+    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b', 'issues', 400)
+    print(scraper.path_output)    
+    print(scraper.CV_query_URL)
 
     #for i in range (0,10):    
         
