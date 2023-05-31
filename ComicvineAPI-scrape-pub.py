@@ -47,6 +47,8 @@ class ComicvineAPI_scraper:
         self.CV_query_string = "/?api_key="
         self.resp_format = "&format=json"
         self.CV_query_URL = None
+        #privates
+        self._CV_timestamp = None
 
     #end of __init__
     
@@ -66,20 +68,17 @@ class ComicvineAPI_scraper:
     #https://towardsdatascience.com/6-approaches-to-validate-class-attributes-in-python-b51cffb8c4ea
     @property 
     def CV_API_KEY(self):
-        print("CV_API_KEY getter was called")
         return self._CV_API_KEY
     
     @CV_API_KEY.setter 
     def CV_API_KEY(self, CV_API_KEY):
         #=======
         #ACTION: put in a validation
-        print("CV_API_KEY setter was called")
         self._CV_API_KEY = CV_API_KEY
         
     @property 
     def CV_resource(self):
         #NOTE: add some validation
-        print("CV_resource getter was called")
         return self._CV_resource
     
     @CV_resource.setter 
@@ -88,7 +87,6 @@ class ComicvineAPI_scraper:
             'issues'
             ,'characters'
             )
-        print("CV_API_KEY setter was called")
         #validation
         if CV_resource not in valid_resource:
             raise Exception("resource parameter provided is invalid, destroying the object")
@@ -96,14 +94,17 @@ class ComicvineAPI_scraper:
     
     @property 
     def CV_query_URL(self):        
-        print("CV_query_URL getter was called")
         return self._CV_query_URL
     
     @CV_query_URL.setter
     def CV_query_URL(self, CV_offset):
-        print("CV_query_URL setter was called")
         #NOTE: add some validation for offset
         self._CV_query_URL = self.build_query_string()
+    
+    #not using a property decorator since I do not want to have a getter/setter pair for this "private"
+    #https://stackoverflow.com/questions/27396339/attributeerror-cant-set-attribute
+    def get_CV_timestamp(self):
+        return self._CV_timestamp
     
 # =============================================================================
 # def load_previous(dir_output):
@@ -165,17 +166,29 @@ class ComicvineAPI_scraper:
 #     #use len() to return number of rows
 #     return ( len(df) + 1 )
 # 
-# def make_request(full_endpt, headers, offset):
-#     
+    #def make_request(full_endpt, headers, offset):
+    def make_request(self):
+        #store the timestamp for banning safety
+        self._CV_timestamp = datetime.datetime.now()
+        print("response at: {}".format(self._CV_timestamp))
+        
+        #go build the full endpoint URL
+        self.full_endpt = self.build_query_string()     
 #     #ACTION: WRITE EXCEPTIONS TO LOGFILE IN THE ELSE CONDITIONS AND THE EXCEPTS!!!!!
-#     with open(GLOBALS["path_output"]+GLOBALS["APIlog_file"], "a") as logfile:
-#         
-#         try:
-#             resp_CV = requests.get(full_endpt, headers = headers)
-#             
-#             #a response of 200 is OK
-#             print("response at {}: {}".format(datetime.datetime.now(), resp_CV))
-#             
+        with open(self.path_output + self.APIlog_file, "a") as logfile:    
+            try:
+                
+                #ACTION: insert logic to prevent too early pulling
+                
+                time_to_wait = datetime.datetime.now() - self._CV_timestamp 
+                #you have to do some kind of modulo for timedelta???
+                print( time_to_wait / datetime.timedelta(minutes=1) )
+            
+                #CV_resp = requests.get(self.full_endpt, headers = self.headers)
+                
+                 #a response of 200 is OK
+                #print("response at {}: {}".format(datetime.datetime.now(), CV_resp))
+            
 #             if resp_CV.status_code == 200: #test for succesful response
 #             
 #     
@@ -202,12 +215,12 @@ class ComicvineAPI_scraper:
 #             else: 
 #                 print("bad response, write to log file...")
 #                 
-#         except requests.Timeout as e:
-#             print("a Timeout error occured: {} \n".format(e))
-#         except requests.ConnectionError as e:
-#             print("a ConnectionError error occured: {} \n".format(e))
-#         except requests.InvalidURL as e:
-#             print("a InvalidURL error occured: {} \n".format(e))
+            except requests.Timeout as e:
+                print("a Timeout error occured: {} \n".format(e))
+            except requests.ConnectionError as e:
+                print("a ConnectionError error occured: {} \n".format(e))
+            except requests.InvalidURL as e:
+                print("a InvalidURL error occured: {} \n".format(e))
 # 
 # def combine_dfs(dfs):
 #     #concat must be passed an "iterable"/"array" of Dataframe objects, I believe ignore_index is
@@ -250,6 +263,11 @@ def main():
     scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b', 'issues', 400)
     print(scraper.path_output)    
     print(scraper.CV_query_URL)
+    scraper.make_request()
+    #print(scraper.make_request())
+    
+    
+
 
     #for i in range (0,10):    
         
