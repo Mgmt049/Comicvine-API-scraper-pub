@@ -47,8 +47,9 @@ class ComicvineAPI_scraper:
         self.CV_query_string = "/?api_key="
         self.resp_format = "&format=json"
         self.CV_query_URL = None
-        #privates
-        self._CV_timestamp = None
+        #privates:
+        self._CV_timestamp = None #set to the current time of obj. construction
+        #self._CV_offset = None
 
     #end of __init__
     
@@ -99,7 +100,9 @@ class ComicvineAPI_scraper:
     @CV_query_URL.setter
     def CV_query_URL(self, CV_offset):
         #NOTE: add some validation for offset
+        #NOTE: you must put an underscore before the instance variable name or else the "getter" will act as a recursive call, throwing a limit error
         self._CV_query_URL = self.build_query_string()
+        #self._CV_query_URL = self.build_query_string()
     
     #not using a property decorator since I do not want to have a getter/setter pair for this "private"
     #https://stackoverflow.com/questions/27396339/attributeerror-cant-set-attribute
@@ -165,63 +168,80 @@ class ComicvineAPI_scraper:
 #     #The end of the "characters" resource list is ~149150
 #     #use len() to return number of rows
 #     return ( len(df) + 1 )
-# 
-    #def make_request(full_endpt, headers, offset):
-    def make_request(self):
-        #store the timestamp for banning safety
-        self._CV_timestamp = datetime.datetime.now()
-        print("response at: {}".format(self._CV_timestamp))
+
+    def execute_get(self):
         
-        #go build the full endpoint URL
-        self.full_endpt = self.build_query_string()     
-#     #ACTION: WRITE EXCEPTIONS TO LOGFILE IN THE ELSE CONDITIONS AND THE EXCEPTS!!!!!
-        with open(self.path_output + self.APIlog_file, "a") as logfile:    
+        with open(self.path_output + self.APIlog_file, "a") as logfile:
+
             try:
+                print("execute_get() at {}".format(datetime.datetime.now()))           
                 
-                #ACTION: insert logic to prevent too early pulling
+                # CV_resp = requests.get(self.full_endpt, headers = self.headers)
+                    
+                # #a response of 200 is OK
+                # print("response at {}: {}".format(datetime.datetime.now(), CV_resp))
                 
-                time_to_wait = datetime.datetime.now() - self._CV_timestamp 
-                #you have to do some kind of modulo for timedelta???
-                print( time_to_wait / datetime.timedelta(minutes=1) )
-            
-                #CV_resp = requests.get(self.full_endpt, headers = self.headers)
-                
-                 #a response of 200 is OK
-                #print("response at {}: {}".format(datetime.datetime.now(), CV_resp))
-            
-#             if resp_CV.status_code == 200: #test for succesful response
-#             
-#     
-#                 #NOTE: you must use the .json() or json.dumps() methods to ensure the object is serializable
-#                     obj_json = json.dumps(resp_CV.json(), indent=4)
-#                     
-#                     #print("type of json object?: ", resp_CV.json().length)
-#                     
-#                     if not resp_CV:
-#                         print("no more results from API call.")
-#                         logfile.write(str(datetime.datetime.now()) + " no more results from API call.\n")
-#                         sys.exit()
-#                     
-#                     #there was a valid response, so handle the temporary JSON...
-#                     with open(GLOBALS["path_output"]+"temp_json.json", "w") as file_json:
-#                         file_json.write(obj_json)
-#                     #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
-#                     with open(GLOBALS["path_output"]+"temp_json.json",'r') as file_json:
-#                         json_CV = json.loads(file_json.read())
-#                     
-#                     logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
-#                     return json_CV #return a json object
-#                         
-#             else: 
-#                 print("bad response, write to log file...")
-#                 
+                # if CV_resp.status_code == 200: #test for succesful response
+    
+                #    #NOTE: you must use the .json() or json.dumps() methods to ensure the object is serializable
+                #     obj_json = json.dumps(CV_resp.json(), indent=4)
+                     
+                #     if not CV_resp:
+                #         print("no more results from API call.")
+                #         logfile.write(str(datetime.datetime.now()) + " no more results from API call.\n")
+                #         sys.exit()
+                     
+                #         #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
+                #         with open(self.path_output + "temp_json.json", "w") as file_json:
+                #             file_json.write(obj_json)
+                #         #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
+                #         with open(self.path_output + "temp_json.json",'r') as file_json:
+                #             json_CV = json.loads(file_json.read())
+                        
+                #         logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
+                #         return json_CV #return a json object
+                            
+                # else: 
+                #     print("bad response, write to log file...")
+    
             except requests.Timeout as e:
                 print("a Timeout error occured: {} \n".format(e))
             except requests.ConnectionError as e:
                 print("a ConnectionError error occured: {} \n".format(e))
             except requests.InvalidURL as e:
                 print("a InvalidURL error occured: {} \n".format(e))
-# 
+    #end of method execute_get()
+                    
+
+    #def make_request(full_endpt, headers, offset):
+    def make_request(self):
+    #this function is a governor to ensure we don't spam the REST endpoint and get banned
+   
+     #ACTION: WRITE EXCEPTIONS TO LOGFILE IN THE ELSE CONDITIONS AND THE EXCEPTS!!!!!    
+        with open(self.path_output + self.APIlog_file, "a") as logfile:    
+
+            try:             
+                if(self._CV_timestamp is not None): #this is the first get() request for the object instance       
+                    #you have to do some kind of modulo for timedelta???
+                    time_to_wait = datetime.datetime.now() - self._CV_timestamp
+                    if(time_to_wait / datetime.timedelta(seconds=1) < 60):
+                        print("NOT YET - time since last GET() is {}, current time is {}".format( time_to_wait / datetime.timedelta(seconds=1),datetime.datetime.now() ) )
+                        return
+            
+                #store the timestamp for banning safety and commence the actual get()               
+                self._CV_timestamp = datetime.datetime.now()
+                self.execute_get()
+                
+                 
+            except requests.Timeout as e:
+                print("a Timeout error occured: {} \n".format(e))
+            except requests.ConnectionError as e:
+                print("a ConnectionError error occured: {} \n".format(e))
+            except requests.InvalidURL as e:
+                print("a InvalidURL error occured: {} \n".format(e))
+        #end of make_request()   
+
+
 # def combine_dfs(dfs):
 #     #concat must be passed an "iterable"/"array" of Dataframe objects, I believe ignore_index is
 #     #necessary for re-numbering the index
@@ -263,18 +283,16 @@ def main():
     scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b', 'issues', 400)
     print(scraper.path_output)    
     print(scraper.CV_query_URL)
-    scraper.make_request()
-    #print(scraper.make_request())
-    
-    
 
+    for i in range(1,50):
+
+        scraper.make_request()
+        print("start to sleep at: {}".format(datetime.datetime.now()))
+        time.sleep(3)  #paramter is in SECONDS    
 
     #for i in range (0,10):    
-        
-        #you must include this headers parameters because the comicvine API requires a "unique user agent" - cannot be null
-        #headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
-        
-        #return a dataFrame
+                
+        #return a dataFrame of the previously-pulled entries
         #df_full_data = load_previous(GLOBALS["path_output"])
         
         #retrieve offset for query string as an integer
