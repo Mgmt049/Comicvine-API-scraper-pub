@@ -179,7 +179,7 @@ class ComicvineAPI_scraper:
                 # CV_resp = requests.get(self.full_endpt, headers = self.headers)
                     
                 # #a response of 200 is OK
-                # print("response at {}: {}".format(datetime.datetime.now(), CV_resp))
+                # print("GET response at {}: {}".format(datetime.datetime.now(), CV_resp))
                 
                 # if CV_resp.status_code == 200: #test for succesful response
     
@@ -190,16 +190,18 @@ class ComicvineAPI_scraper:
                 #         print("no more results from API call.")
                 #         logfile.write(str(datetime.datetime.now()) + " no more results from API call.\n")
                 #         sys.exit()
+                
+                #ACTION: CALL THE process_JSON METHOD HERE
                      
-                #         #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
-                #         with open(self.path_output + "temp_json.json", "w") as file_json:
-                #             file_json.write(obj_json)
-                #         #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
-                #         with open(self.path_output + "temp_json.json",'r') as file_json:
-                #             json_CV = json.loads(file_json.read())
-                        
-                #         logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
-                #         return json_CV #return a json object
+            #         #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
+            #         with open(self.path_output + "temp_json.json", "w") as file_json:
+            #             file_json.write(obj_json)
+            #         #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
+            #         with open(self.path_output + "temp_json.json",'r') as file_json:
+            #             json_CV = json.loads(file_json.read())
+                    
+            #         logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
+            #         return json_CV #return a json object
                             
                 # else: 
                 #     print("bad response, write to log file...")
@@ -211,7 +213,20 @@ class ComicvineAPI_scraper:
             except requests.InvalidURL as e:
                 print("a InvalidURL error occured: {} \n".format(e))
     #end of method execute_get()
-                    
+    
+    def process_JSON(self, CV_resp):
+        print("process_JSON() called")
+        #         #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
+        #         with open(self.path_output + "temp_json.json", "w") as file_json:
+        #             file_json.write(obj_json)
+        #         #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
+        #         with open(self.path_output + "temp_json.json",'r') as file_json:
+        #             json_CV = json.loads(file_json.read())
+                
+        #         logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
+        #         return json_CV #return a json object
+
+    #end of process_JSON()
 
     #def make_request(full_endpt, headers, offset):
     def make_request(self):
@@ -227,7 +242,8 @@ class ComicvineAPI_scraper:
                     if(time_to_wait / datetime.timedelta(seconds=1) < 60):
                         print("NOT YET - time since last GET() is {}, current time is {}".format( time_to_wait / datetime.timedelta(seconds=1),datetime.datetime.now() ) )
                         return
-            
+                
+                #ACTION: figure out the offset problem and then do a git commit
                 #store the timestamp for banning safety and commence the actual get()               
                 self._CV_timestamp = datetime.datetime.now()
                 self.execute_get()
