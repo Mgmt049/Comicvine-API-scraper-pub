@@ -150,7 +150,9 @@ class ComicvineAPI_scraper:
         #The end of the "characters" resource list is around 149150
         CV_sort_offset_string = "&sort=name: asc&offset=%s"%(self.CV_offset)
         
-        return self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
+        #return self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
+        self._CV_query_URL = self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
+    
 
 # def normalize_df(json_CV):
 #     
@@ -174,22 +176,30 @@ class ComicvineAPI_scraper:
         with open(self.path_output + self.APIlog_file, "a") as logfile:
 
             try:
-                print("execute_get() at {}".format(datetime.datetime.now()))           
+                print("execute_get() at {}".format(datetime.datetime.now())) 
                 
-                # CV_resp = requests.get(self.full_endpt, headers = self.headers)
+                #self.CV_query_string = self.build_query_string()
+                
+                #build the query string (a "private" variable)
+                self.build_query_string()
+                
+                print("full query string/endpoint: {}".format(self._CV_query_URL))
+                
+                #CV_resp = requests.get(self.full_endpt, headers = self.headers)
+                CV_resp = requests.get(self._CV_query_URL, headers = self.headers)
                     
-                # #a response of 200 is OK
-                # print("GET response at {}: {}".format(datetime.datetime.now(), CV_resp))
+                #a response of 200 is OK
+                print("GET response at {}: {}".format(datetime.datetime.now(), CV_resp))
                 
-                # if CV_resp.status_code == 200: #test for succesful response
+                if CV_resp.status_code == 200: #test for succesful response
     
-                #    #NOTE: you must use the .json() or json.dumps() methods to ensure the object is serializable
-                #     obj_json = json.dumps(CV_resp.json(), indent=4)
+                #NOTE: you must use the .json() or json.dumps() methods to ensure the object is serializable
+                    obj_json = json.dumps(CV_resp.json(), indent=4)
                      
-                #     if not CV_resp:
-                #         print("no more results from API call.")
-                #         logfile.write(str(datetime.datetime.now()) + " no more results from API call.\n")
-                #         sys.exit()
+                    if not CV_resp:
+                        print("no more results from API call.")
+                        logfile.write(str(datetime.datetime.now()) + " no more results from API call.\n")
+                        sys.exit()
                 
                 #ACTION: CALL THE process_JSON METHOD HERE
                      
