@@ -50,6 +50,7 @@ class ComicvineAPI_scraper:
         #privates:
         self._CV_timestamp = None #set to the current time of obj. construction
         #self._CV_offset = None
+        self._CV_processed_json = None
 
     #end of __init__
     
@@ -109,6 +110,11 @@ class ComicvineAPI_scraper:
     def get_CV_timestamp(self):
         return self._CV_timestamp
     
+    #not using a property decorator since I do not want to have a getter/setter pair for this "private"
+    #https://stackoverflow.com/questions/27396339/attributeerror-cant-set-attribute
+    def get_processed_json(self):
+        return self._CV_processed_json
+    
 # =============================================================================
 # def load_previous(dir_output):
 #     #to mark when previous dataset is loaded:
@@ -154,18 +160,24 @@ class ComicvineAPI_scraper:
         self._CV_query_URL = self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
     
 
-# def normalize_df(json_CV):
-#     
-#     #grab the current date for timestamping
-#     formatted_date = datetime.datetime.now()
-#     formatted_date = formatted_date.strftime('%M-%D-%Y')
-#     print("timestamp pulled in normalize_df() %s"%(datetime.datetime.now()))
-#     
-#     json_CV = pd.json_normalize(json_CV, record_path =['results'],meta=['error', 'limit', 'offset'])
-#     #append the timestamp column onto the dataframe
-#     json_CV['TS_pulled'] = datetime.datetime.now()
-#     return json_CV
-# 
+    def normalize_df(self):
+     
+        #grab the current date for timestamping
+        formatted_date = datetime.datetime.now()
+        formatted_date = formatted_date.strftime('%M-%D-%Y')
+        print("timestamp pulled in normalize_df() %s"%(datetime.datetime.now()))
+        
+        #json_CV = pd.json_normalize(json_CV, record_path =['results'],meta=['error', 'limit', 'offset'])
+        #self._CV_processed_json is the finalized JSON result from the API call and processing
+        df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
+        #append the timestamp column onto the dataframe
+        #json_CV['TS_pulled'] = datetime.datetime.now()
+        df_json_CV['TS_pulled'] = datetime.datetime.now()
+        #return json_CV
+        return df_json_CV
+    
+    #end of normalize_df()
+
 # def calc_offset(df):
 #     #The end of the "characters" resource list is ~149150
 #     #use len() to return number of rows
@@ -202,19 +214,13 @@ class ComicvineAPI_scraper:
                         sys.exit()
                 
                 #ACTION: CALL THE process_JSON METHOD HERE
+                    self._CV_processed_json = self.process_JSON(obj_json)
+                    logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
                      
-            #         #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
-            #         with open(self.path_output + "temp_json.json", "w") as file_json:
-            #             file_json.write(obj_json)
-            #         #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
-            #         with open(self.path_output + "temp_json.json",'r') as file_json:
-            #             json_CV = json.loads(file_json.read())
-                    
-            #         logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
-            #         return json_CV #return a json object
+                    #return json_processed #return a json object
                             
-                # else: 
-                #     print("bad response, write to log file...")
+                else: 
+                     print("bad response, write to log file...")
     
             except requests.Timeout as e:
                 print("a Timeout error occured: {} \n".format(e))
@@ -224,18 +230,16 @@ class ComicvineAPI_scraper:
                 print("a InvalidURL error occured: {} \n".format(e))
     #end of method execute_get()
     
-    def process_JSON(self, CV_resp):
+    def process_JSON(self, obj_json):
+        #this method is to do a JSON "swap" that is necessary for usable JSON
         print("process_JSON() called")
-        #         #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
-        #         with open(self.path_output + "temp_json.json", "w") as file_json:
-        #             file_json.write(obj_json)
-        #         #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
-        #         with open(self.path_output + "temp_json.json",'r') as file_json:
-        #             json_CV = json.loads(file_json.read())
-                
-        #         logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
-        #         return json_CV #return a json object
-
+        #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
+        with open(self.path_output + "temp_json.json", "w") as file_json:
+            file_json.write(obj_json)
+        #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
+        with open(self.path_output + "temp_json.json",'r') as file_json:
+            json_formatted = json.loads(file_json.read())
+            return json_formatted #return a json object
     #end of process_JSON()
 
     #def make_request(full_endpt, headers, offset):
@@ -249,16 +253,17 @@ class ComicvineAPI_scraper:
                 if(self._CV_timestamp is not None): #this is the first get() request for the object instance       
                     #you have to do some kind of modulo for timedelta???
                     time_to_wait = datetime.datetime.now() - self._CV_timestamp
-                    if(time_to_wait / datetime.timedelta(seconds=1) < 60):
-                        print("NOT YET - time since last GET() is {}, current time is {}".format( time_to_wait / datetime.timedelta(seconds=1),datetime.datetime.now() ) )
+                    if(time_to_wait / datetime.timedelta(seconds=1) < 80):  #keep the throttle at 1 minute 20 seconds just in case
+                        print("cannot get() YET! - time since last GET() is {}, current time is {}".format( time_to_wait / datetime.timedelta(seconds=1),datetime.datetime.now() ) )
                         return
                 
                 #ACTION: figure out the offset problem and then do a git commit
                 #store the timestamp for banning safety and commence the actual get()               
                 self._CV_timestamp = datetime.datetime.now()
                 self.execute_get()
+                df_API_result = self.normalize_df()
+                return df_API_result
                 
-                 
             except requests.Timeout as e:
                 print("a Timeout error occured: {} \n".format(e))
             except requests.ConnectionError as e:
@@ -312,7 +317,12 @@ def main():
 
     for i in range(1,50):
 
-        scraper.make_request()
+        df_result = scraper.make_request()
+        #print(scraper.get_processed_json())
+        if(df_result is not None):
+            #print( df_result.head() )
+            #display a slice of the dataFrame
+            print( df_result.iloc[0:5,3:7] )
         print("start to sleep at: {}".format(datetime.datetime.now()))
         time.sleep(3)  #paramter is in SECONDS    
 
