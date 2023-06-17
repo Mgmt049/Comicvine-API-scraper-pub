@@ -112,6 +112,7 @@ class ComicvineAPI_scraper:
     
     #not using a property decorator since I do not want to have a getter/setter pair for this "private"
     #https://stackoverflow.com/questions/27396339/attributeerror-cant-set-attribute
+    @property
     def get_processed_json(self):
         return self._CV_processed_json
     
@@ -315,16 +316,17 @@ def main():
     print(scraper.path_output)    
     print(scraper.CV_query_URL)
 
-    for i in range(1,50):
+    #for i in range(1,50):
 
-        df_result = scraper.make_request()
-        #print(scraper.get_processed_json())
-        if(df_result is not None):
-            #print( df_result.head() )
-            #display a slice of the dataFrame
-            print( df_result.iloc[0:5,3:7] )
-        print("start to sleep at: {}".format(datetime.datetime.now()))
-        time.sleep(3)  #paramter is in SECONDS    
+    df_result = scraper.make_request()
+    #print(scraper.get_processed_json())
+    if(df_result is not None):
+        #print( df_result.head() )
+        #display a slice of the dataFrame
+        print( df_result.iloc[0:5,3:7] )
+    print("sleep at: {}".format(datetime.datetime.now()))
+    time.sleep(3)  #paramter is in SECONDS    
+    print(scraper._CV_processed_json)
 
     #for i in range (0,10):    
                 
