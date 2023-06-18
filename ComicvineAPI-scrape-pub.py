@@ -47,6 +47,8 @@ class ComicvineAPI_scraper:
         self.CV_query_string = "/?api_key="
         self.resp_format = "&format=json"
         self.CV_query_URL = None
+        #this is the dataFrame that will be returned to the client code
+        self.df_json_CV = None
         #privates:
         self._CV_timestamp = None #set to the current time of obj. construction
         #self._CV_offset = None
@@ -170,12 +172,18 @@ class ComicvineAPI_scraper:
         
         #json_CV = pd.json_normalize(json_CV, record_path =['results'],meta=['error', 'limit', 'offset'])
         #self._CV_processed_json is the finalized JSON result from the API call and processing
-        df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
+        
+        #df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
+        
+        self.df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
+        
         #append the timestamp column onto the dataframe
         #json_CV['TS_pulled'] = datetime.datetime.now()
-        df_json_CV['TS_pulled'] = datetime.datetime.now()
+        
+        self.df_json_CV['TS_pulled'] = datetime.datetime.now()
+        
         #return json_CV
-        return df_json_CV
+        return self.df_json_CV
     
     #end of normalize_df()
 
@@ -316,17 +324,17 @@ def main():
     print(scraper.path_output)    
     print(scraper.CV_query_URL)
 
-    #for i in range(1,50):
+    for i in range(1,100):
 
-    df_result = scraper.make_request()
-    #print(scraper.get_processed_json())
-    if(df_result is not None):
-        #print( df_result.head() )
-        #display a slice of the dataFrame
-        print( df_result.iloc[0:5,3:7] )
-    print("sleep at: {}".format(datetime.datetime.now()))
-    time.sleep(3)  #paramter is in SECONDS    
-    print(scraper._CV_processed_json)
+        df_result = scraper.make_request()
+            #print(scraper.get_processed_json())
+        if(df_result is not None):
+            #print( df_result.head() )
+            #display a slice of the dataFrame
+            print( df_result.iloc[0:8,1:18] )
+        print("sleep at: {}".format(datetime.datetime.now()))
+        time.sleep(3)  #paramter is in SECONDS    
+        #print(scraper._CV_processed_json)
 
     #for i in range (0,10):    
                 
