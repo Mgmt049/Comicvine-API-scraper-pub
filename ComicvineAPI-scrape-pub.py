@@ -49,7 +49,7 @@ class ComicvineAPI_scraper:
         self.CV_query_URL = None
         #this is the dataFrame that will be returned to the client code
         self.df_json_CV = None
-        #privates:
+        #privates: Prefixing with '_' indicates it's a private attribute
         self._CV_timestamp = None #set to the current time of obj. construction
         #self._CV_offset = None
         self._CV_processed_json = None
@@ -114,9 +114,17 @@ class ComicvineAPI_scraper:
     
     #not using a property decorator since I do not want to have a getter/setter pair for this "private"
     #https://stackoverflow.com/questions/27396339/attributeerror-cant-set-attribute
-    @property
-    def get_processed_json(self):
-        return self._CV_processed_json
+    # @property
+    # def get_processed_json(self):
+    #     return self._CV_processed_json
+    
+   
+    #@property 
+    #Using properties: You can use the @property decorator to define a getter method for a READ-ONLY attribute, 
+    #but omit the setter method. This allows you to retrieve the value of the attribute, 
+    #but attempting to modify it will result in an "AttributeError: can't set attribute"
+    def df_json_CV(self):        
+        return self.df_json_CV
     
 # =============================================================================
 # def load_previous(dir_output):
@@ -324,17 +332,17 @@ def main():
     print(scraper.path_output)    
     print(scraper.CV_query_URL)
 
-    for i in range(1,100):
+    #for i in range(1,100):
 
-        df_result = scraper.make_request()
-            #print(scraper.get_processed_json())
-        if(df_result is not None):
-            #print( df_result.head() )
-            #display a slice of the dataFrame
-            print( df_result.iloc[0:8,1:18] )
-        print("sleep at: {}".format(datetime.datetime.now()))
-        time.sleep(3)  #paramter is in SECONDS    
-        #print(scraper._CV_processed_json)
+    df_result = scraper.make_request()
+        #print(scraper.get_processed_json())
+    if(df_result is not None):
+        #print( df_result.head() )
+        #display a slice of the dataFrame
+        print( df_result.iloc[0:8,1:18] )
+    print("sleep at: {}".format(datetime.datetime.now()))
+    time.sleep(3)  #paramter is in SECONDS    
+    print(scraper.df_json_CV.shape)  #this is a Dataframe object
 
     #for i in range (0,10):    
                 
