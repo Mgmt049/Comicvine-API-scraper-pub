@@ -92,8 +92,21 @@ class ComicvineAPI_scraper:
             )
         #validation
         if CV_resource not in valid_resource:
-            raise Exception("resource parameter provided is invalid, destroying the object")
+            raise Exception("CV_resource parameter provided is invalid, destroying the object")
         self._CV_resource = CV_resource
+        
+    @property 
+    def CV_offset(self):
+        #NOTE: add some validation
+        return self._CV_offset
+    
+    @CV_offset.setter 
+    def CV_offset(self, CV_offset):
+        #validation
+        if type(CV_offset) is not int: 
+            raise Exception("CV_offset parameter provided is invalid, destroying the object")
+        #NOTE: you must put an underscore before the instance variable name or else the "getter" will act as a recursive call, throwing a limit error
+        self._CV_offset = CV_offset
     
     @property 
     def CV_query_URL(self):        
@@ -321,9 +334,11 @@ class ComicvineAPI_scraper:
 
 def main():
     
-    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b', 'issues', 400)
+    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues',400)
     print(scraper.path_output)    
-    print(scraper.CV_query_URL)
+
+    scraper.CV_offset = 777
+    print(scraper.CV_offset)
 
     #for i in range(1,100):
 
@@ -332,39 +347,12 @@ def main():
     if(df_result is not None):
         #print( df_result.head() )
         #display a slice of the dataFrame
-        print(df_result.iloc[0:8,1:18] )
-        print(df_result['volume.name'][30:40])
+        #print(df_result.iloc[0:8,1:18] )
+        print(scraper.CV_query_URL)
+        print(df_result['volume.name'][3:20])
     print("sleep at: {}".format(datetime.datetime.now()))
     time.sleep(3)  #paramter is in SECONDS    
     print(scraper.df_json_CV.shape)  #this is a Dataframe object
-
-    #for i in range (0,10):    
-                
-        #return a dataFrame of the previously-pulled entries
-        #df_full_data = load_previous(GLOBALS["path_output"])
-        
-        #retrieve offset for query string as an integer
-        #offset = calc_offset(df_full_data)   
-        
-        #pass an integer and retrieve a full http query string
-        #full_endpt = build_query_string(GLOBALS["base_endpt"], offset)
-        
-        #print(full_endpt)
-        
-        #request JSON
-        #json_CV = make_request(full_endpt, GLOBALS["headers"], offset)
-        
-        # Normalizing data - creates a dataFrame
-        #f_CV_norm = normalize_df(json_CV)
-        
-        #df_full_data = combine_dfs([df_full_data,df_CV_norm]) #pass a list of dataframes: "old" and new
-            
-        #print("df_full_data in main(): ", df_full_data.shape)
-        
-        #write combined results to file
-        #write_results(df_full_data, GLOBALS["path_output"])
-        
-        #time.sleep(600)
         
 if __name__ == "__main__":
     main()
