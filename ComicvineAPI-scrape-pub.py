@@ -47,11 +47,10 @@ class ComicvineAPI_scraper:
         self.CV_query_string = "/?api_key="
         self.resp_format = "&format=json"
         self.CV_query_URL = None
-        #this is the dataFrame that will be returned to the client code
+        #this is the dataFrame that will be exposed to the client code for easy retreival
         self.df_json_CV = None
-        #privates: Prefixing with '_' indicates it's a private attribute
+        #private attributes:         #Prefixing with '_' indicates it's a private attribute
         self._CV_timestamp = None #set to the current time of obj. construction
-        #self._CV_offset = None
         self._CV_processed_json = None
 
     #end of __init__
@@ -111,18 +110,11 @@ class ComicvineAPI_scraper:
     #https://stackoverflow.com/questions/27396339/attributeerror-cant-set-attribute
     def get_CV_timestamp(self):
         return self._CV_timestamp
-    
-    #not using a property decorator since I do not want to have a getter/setter pair for this "private"
-    #https://stackoverflow.com/questions/27396339/attributeerror-cant-set-attribute
-    # @property
-    # def get_processed_json(self):
-    #     return self._CV_processed_json
-    
-   
-    #@property 
-    #Using properties: You can use the @property decorator to define a getter method for a READ-ONLY attribute, 
-    #but omit the setter method. This allows you to retrieve the value of the attribute, 
-    #but attempting to modify it will result in an "AttributeError: can't set attribute"
+       
+    #Using properties: You can use the @property decorator to define a getter method 
+    #but omit the setter method for a READ-ONLY attribute,  
+    #attempting to modify it will result in an "AttributeError: can't set attribute"
+    #thus, you should only do this when you intend to create a read-only attribute with NO setting 
     def df_json_CV(self):        
         return self.df_json_CV
     
@@ -166,29 +158,29 @@ class ComicvineAPI_scraper:
         #https://comicvine.gamespot.com/forums/api-developers-2334/paging-through-results-page-or-offset-1450438/
         #The end of the "characters" resource list is around 149150
         CV_sort_offset_string = "&sort=name: asc&offset=%s"%(self.CV_offset)
-        
         #return self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
         self._CV_query_URL = self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
     
+    #end of build_query_string()
 
     def normalize_df(self):
      
         #grab the current date for timestamping
         formatted_date = datetime.datetime.now()
         formatted_date = formatted_date.strftime('%M-%D-%Y')
-        print("timestamp pulled in normalize_df() %s"%(datetime.datetime.now()))
+        #print("timestamp pulled in normalize_df() %s"%(datetime.datetime.now()))
         
         #json_CV = pd.json_normalize(json_CV, record_path =['results'],meta=['error', 'limit', 'offset'])
         #self._CV_processed_json is the finalized JSON result from the API call and processing
-        
         #df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
         
+        #create a DataFrame from the normalized JSON
         self.df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
         
         #append the timestamp column onto the dataframe
-        #json_CV['TS_pulled'] = datetime.datetime.now()
         
-        self.df_json_CV['TS_pulled'] = datetime.datetime.now()
+        #self.df_json_CV['TS_pulled'] = datetime.datetime.now()
+        self.df_json_CV['TS_pulled'] = formatted_date
         
         #return json_CV
         return self.df_json_CV
@@ -201,6 +193,7 @@ class ComicvineAPI_scraper:
 #     return ( len(df) + 1 )
 
     def execute_get(self):
+        #this function actually executes the API call, get()
         
         with open(self.path_output + self.APIlog_file, "a") as logfile:
 
@@ -339,7 +332,8 @@ def main():
     if(df_result is not None):
         #print( df_result.head() )
         #display a slice of the dataFrame
-        print( df_result.iloc[0:8,1:18] )
+        print(df_result.iloc[0:8,1:18] )
+        print(df_result['volume.name'][30:40])
     print("sleep at: {}".format(datetime.datetime.now()))
     time.sleep(3)  #paramter is in SECONDS    
     print(scraper.df_json_CV.shape)  #this is a Dataframe object
