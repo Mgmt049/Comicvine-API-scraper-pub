@@ -50,7 +50,9 @@ class ComicvineAPI_scraper:
         #this is the dataFrame that will be exposed to the client code for easy retreival
         self.df_json_CV = None
         #private attributes:         #Prefixing with '_' indicates it's a private attribute
-        self._CV_timestamp = None #set to the current time of obj. construction
+        #self._CV_timestamp = None #set to the current time of obj. construction
+        self.CV_timestamp = None #set to the current time of obj. construction
+        
         self._CV_processed_json = None
 
     #end of __init__
@@ -122,7 +124,8 @@ class ComicvineAPI_scraper:
     #not using a property decorator since I do not want to have a getter/setter pair for this "private"
     #https://stackoverflow.com/questions/27396339/attributeerror-cant-set-attribute
     def get_CV_timestamp(self):
-        return self._CV_timestamp
+    #    return self._CV_timestamp
+        return self.CV_timestamp
        
     #Using properties: You can use the @property decorator to define a getter method 
     #but omit the setter method for a READ-ONLY attribute,  
@@ -273,16 +276,23 @@ class ComicvineAPI_scraper:
         with open(self.path_output + self.APIlog_file, "a") as logfile:    
 
             try:             
-                if(self._CV_timestamp is not None): #this is the first get() request for the object instance       
+                #if(self._CV_timestamp is not None): #this is the first get() request for the object instance
+                if(self.CV_timestamp is not None): #this is the first get() request for the object instance
+                
+                
                     #you have to do some kind of modulo for timedelta???
-                    time_to_wait = datetime.datetime.now() - self._CV_timestamp
+                    #time_to_wait = datetime.datetime.now() - self._CV_timestamp
+                    time_to_wait = datetime.datetime.now() - self.CV_timestamp
+                    
                     if(time_to_wait / datetime.timedelta(seconds=1) < 80):  #keep the throttle at 1 minute 20 seconds just in case
                         print("cannot get() YET! - time since last GET() is {}, current time is {}".format( time_to_wait / datetime.timedelta(seconds=1),datetime.datetime.now() ) )
                         return
                 
                 #ACTION: figure out the offset problem and then do a git commit
                 #store the timestamp for banning safety and commence the actual get()               
-                self._CV_timestamp = datetime.datetime.now()
+                #self._CV_timestamp = datetime.datetime.now()
+                self.CV_timestamp = datetime.datetime.now()
+                
                 self.execute_get()
                 df_API_result = self.normalize_df()
                 return df_API_result
@@ -334,25 +344,20 @@ class ComicvineAPI_scraper:
 
 def main():
     
-    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues',400)
+    #scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues',400)
+    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','characters',400)
     print(scraper.path_output)    
 
-    scraper.CV_offset = 777
-    print(scraper.CV_offset)
+    for i in range(1,100):
 
-    #for i in range(1,100):
-
-    df_result = scraper.make_request()
+        df_result = scraper.make_request()
         #print(scraper.get_processed_json())
-    if(df_result is not None):
-        #print( df_result.head() )
-        #display a slice of the dataFrame
-        #print(df_result.iloc[0:8,1:18] )
-        print(scraper.CV_query_URL)
-        print(df_result['volume.name'][3:20])
-    print("sleep at: {}".format(datetime.datetime.now()))
-    time.sleep(3)  #paramter is in SECONDS    
-    print(scraper.df_json_CV.shape)  #this is a Dataframe object
+        if(df_result is not None):
+            print(scraper.CV_query_URL)
+            print(df_result.iloc[0:10,3:8])
+            #print(df_result['volume.name'][3:20])
+        print("sleep at: {}".format(datetime.datetime.now()))
+        time.sleep(3)  #paramter is in SECONDS    
         
 if __name__ == "__main__":
     main()
