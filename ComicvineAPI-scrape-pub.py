@@ -8,9 +8,10 @@ import json
 import sys
 import os #for file path testing
 import datetime
-import shutil as sh
+#import shutil as sh
 import time
 #from XlsxWriter import FileCreateError
+import random
 
 #############################################################################################
 #PURPOSE:  is to retrive JSON from a ComicVine REST API endpoint and download to Excel records
@@ -52,7 +53,6 @@ class ComicvineAPI_scraper:
         #private attributes:         #Prefixing with '_' indicates it's a private attribute
         #self._CV_timestamp = None #set to the current time of obj. construction
         self.CV_timestamp = None #set to the current time of obj. construction
-        
         self._CV_processed_json = None
 
     #end of __init__
@@ -180,6 +180,7 @@ class ComicvineAPI_scraper:
     #end of build_query_string()
 
     def normalize_df(self):
+        #set the instance variable dataframe to the converted get() result
      
         #grab the current date for timestamping
         formatted_date = datetime.datetime.now()
@@ -198,8 +199,7 @@ class ComicvineAPI_scraper:
         #self.df_json_CV['TS_pulled'] = datetime.datetime.now()
         self.df_json_CV['TS_pulled'] = formatted_date
         
-        #return json_CV
-        return self.df_json_CV
+        #return self.df_json_CV
     
     #end of normalize_df()
 
@@ -273,6 +273,7 @@ class ComicvineAPI_scraper:
     #this function is a governor to ensure we don't spam the REST endpoint and get banned
    
      #ACTION: WRITE EXCEPTIONS TO LOGFILE IN THE ELSE CONDITIONS AND THE EXCEPTS!!!!!    
+     #ACTION: find a way to return the response code!!!
         with open(self.path_output + self.APIlog_file, "a") as logfile:    
 
             try:             
@@ -294,8 +295,9 @@ class ComicvineAPI_scraper:
                 self.CV_timestamp = datetime.datetime.now()
                 
                 self.execute_get()
-                df_API_result = self.normalize_df()
-                return df_API_result
+                #df_API_result = self.normalize_df()
+                self.normalize_df()
+                #return df_API_result
                 
             except requests.Timeout as e:
                 print("a Timeout error occured: {} \n".format(e))
@@ -344,20 +346,30 @@ class ComicvineAPI_scraper:
 
 def main():
     
-    #scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues',400)
-    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','characters',400)
+    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues',400)
+    #scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','characters',400)
     print(scraper.path_output)    
 
-    for i in range(1,100):
-
-        df_result = scraper.make_request()
-        #print(scraper.get_processed_json())
+    for i in range(1, 100):
+        
+        #generate a random offset and use it
+        randint = random.randint(1, 10)
+        offset = randint * 100
+        print(offset)
+        scraper.CV_offset = offset
+        #call it
+        scraper.make_request()
+        
+        df_result = scraper.df_json_CV
+        
         if(df_result is not None):
+            
             print(scraper.CV_query_URL)
-            print(df_result.iloc[0:10,3:8])
-            #print(df_result['volume.name'][3:20])
-        print("sleep at: {}".format(datetime.datetime.now()))
-        time.sleep(3)  #paramter is in SECONDS    
+            
+            #print(df_result.iloc[0:10,3:8])
+            print(df_result['volume.name'][3:7])
+            print("sleep at: {}".format(datetime.datetime.now()))
+            time.sleep(3)  #paramter is in SECONDS    
         
 if __name__ == "__main__":
     main()
