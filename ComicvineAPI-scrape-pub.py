@@ -34,6 +34,8 @@ class ComicvineAPI_scraper:
     #you must include this headers parameters because the comicvine API requires a "unique user agent" - cannot be null
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36"}
     APIlog_file = "API_log.txt"
+    #this is the preventative "stop" between comicvine API calls
+    CV_wait_time = 22
     
     def __init__(self
                 ,path_output
@@ -179,29 +181,6 @@ class ComicvineAPI_scraper:
     
     #end of build_query_string()
 
-    def normalize_df(self):
-        #set the instance variable dataframe to the converted get() result
-     
-        #grab the current date for timestamping
-        formatted_date = datetime.datetime.now()
-        formatted_date = formatted_date.strftime('%M-%D-%Y')
-        #print("timestamp pulled in normalize_df() %s"%(datetime.datetime.now()))
-        
-        #json_CV = pd.json_normalize(json_CV, record_path =['results'],meta=['error', 'limit', 'offset'])
-        #self._CV_processed_json is the finalized JSON result from the API call and processing
-        #df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
-        
-        #create a DataFrame from the normalized JSON
-        self.df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
-        
-        #append the timestamp column onto the dataframe
-        
-        #self.df_json_CV['TS_pulled'] = datetime.datetime.now()
-        self.df_json_CV['TS_pulled'] = formatted_date
-        
-        #return self.df_json_CV
-    
-    #end of normalize_df()
 
 # def calc_offset(df):
 #     #The end of the "characters" resource list is ~149150
@@ -280,12 +259,11 @@ class ComicvineAPI_scraper:
                 #if(self._CV_timestamp is not None): #this is the first get() request for the object instance
                 if(self.CV_timestamp is not None): #this is the first get() request for the object instance
                 
-                
                     #you have to do some kind of modulo for timedelta???
                     #time_to_wait = datetime.datetime.now() - self._CV_timestamp
                     time_to_wait = datetime.datetime.now() - self.CV_timestamp
                     
-                    if(time_to_wait / datetime.timedelta(seconds=1) < 80):  #keep the throttle at 1 minute 20 seconds just in case
+                    if(time_to_wait / datetime.timedelta(seconds=1) < CV_wait_time):  #you are only allowed 200 Comicvine calls per hour per resource
                         print("cannot get() YET! - time since last GET() is {}, current time is {}".format( time_to_wait / datetime.timedelta(seconds=1),datetime.datetime.now() ) )
                         return
                 
@@ -307,6 +285,29 @@ class ComicvineAPI_scraper:
                 print("a InvalidURL error occured: {} \n".format(e))
         #end of make_request()   
 
+    def normalize_df(self):
+        #set the instance variable dataframe to the converted get() result
+     
+        #grab the current date for timestamping
+        formatted_date = datetime.datetime.now()
+        formatted_date = formatted_date.strftime('%M-%D-%Y')
+        #print("timestamp pulled in normalize_df() %s"%(datetime.datetime.now()))
+        
+        #json_CV = pd.json_normalize(json_CV, record_path =['results'],meta=['error', 'limit', 'offset'])
+        #self._CV_processed_json is the finalized JSON result from the API call and processing
+        #df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
+        
+        #create a DataFrame from the normalized JSON
+        self.df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
+        
+        #append the timestamp column onto the dataframe
+        
+        #self.df_json_CV['TS_pulled'] = datetime.datetime.now()
+        self.df_json_CV['TS_pulled'] = formatted_date
+        
+        #return self.df_json_CV
+    
+    #end of normalize_df()
 
 # def combine_dfs(dfs):
 #     #concat must be passed an "iterable"/"array" of Dataframe objects, I believe ignore_index is
