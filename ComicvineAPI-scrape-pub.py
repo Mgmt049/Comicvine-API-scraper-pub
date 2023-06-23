@@ -169,17 +169,6 @@ class ComicvineAPI_scraper:
 #             sys.exit() #terminate the whole program
 # 
 # 
-    def build_query_string( self ):
-        
-        CV_filter_string = ""
-        
-        #https://comicvine.gamespot.com/forums/api-developers-2334/paging-through-results-page-or-offset-1450438/
-        #The end of the "characters" resource list is around 149150
-        CV_sort_offset_string = "&sort=name: asc&offset=%s"%(self.CV_offset)
-        #return self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
-        self._CV_query_URL = self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
-    
-    #end of build_query_string()
 
 
 # def calc_offset(df):
@@ -200,7 +189,7 @@ class ComicvineAPI_scraper:
                 #build the query string (a "private" variable)
                 self.build_query_string()
                 
-                print("full query string/endpoint: {}".format(self._CV_query_URL))
+                #print("full query string/endpoint: {}".format(self._CV_query_URL))
                 
                 #CV_resp = requests.get(self.full_endpt, headers = self.headers)
                 CV_resp = requests.get(self._CV_query_URL, headers = self.headers)
@@ -235,18 +224,6 @@ class ComicvineAPI_scraper:
                 print("a InvalidURL error occured: {} \n".format(e))
     #end of method execute_get()
     
-    def process_JSON(self, obj_json):
-        #this method is to do a JSON "swap" that is necessary for usable JSON
-        print("process_JSON() called")
-        #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
-        with open(self.path_output + "temp_json.json", "w") as file_json:
-            file_json.write(obj_json)
-        #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
-        with open(self.path_output + "temp_json.json",'r') as file_json:
-            json_formatted = json.loads(file_json.read())
-            return json_formatted #return a json object
-    #end of process_JSON()
-
     #def make_request(full_endpt, headers, offset):
     def make_request(self):
     #this function is a governor to ensure we don't spam the REST endpoint and get banned
@@ -263,7 +240,7 @@ class ComicvineAPI_scraper:
                     #time_to_wait = datetime.datetime.now() - self._CV_timestamp
                     time_to_wait = datetime.datetime.now() - self.CV_timestamp
                     
-                    if(time_to_wait / datetime.timedelta(seconds=1) < CV_wait_time):  #you are only allowed 200 Comicvine calls per hour per resource
+                    if(time_to_wait / datetime.timedelta(seconds=1) < self.CV_wait_time):  #you are only allowed 200 Comicvine calls per hour per resource
                         print("cannot get() YET! - time since last GET() is {}, current time is {}".format( time_to_wait / datetime.timedelta(seconds=1),datetime.datetime.now() ) )
                         return
                 
@@ -308,6 +285,30 @@ class ComicvineAPI_scraper:
         #return self.df_json_CV
     
     #end of normalize_df()
+    
+    def process_JSON(self, obj_json):
+        #this method is to do a JSON "swap" that is necessary for usable JSON
+        
+        #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
+        with open(self.path_output + "temp_json.json", "w") as file_json:
+            file_json.write(obj_json)
+        #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
+        with open(self.path_output + "temp_json.json",'r') as file_json:
+            json_formatted = json.loads(file_json.read())
+            return json_formatted #return a json object
+    #end of process_JSON()
+    
+    def build_query_string( self ):
+        
+        CV_filter_string = ""
+        
+        #https://comicvine.gamespot.com/forums/api-developers-2334/paging-through-results-page-or-offset-1450438/
+        #The end of the "characters" resource list is around 149150
+        CV_sort_offset_string = "&sort=name: asc&offset=%s"%(self.CV_offset)
+        #return self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
+        self._CV_query_URL = self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
+    
+    #end of build_query_string()
 
 # def combine_dfs(dfs):
 #     #concat must be passed an "iterable"/"array" of Dataframe objects, I believe ignore_index is
@@ -348,14 +349,17 @@ class ComicvineAPI_scraper:
 def main():
     
     scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues',400)
-    #scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','characters',400)
-    print(scraper.path_output)    
+    
+    #print(scraper.path_output)    
 
     for i in range(1, 100):
         
         #generate a random offset and use it
-        randint = random.randint(1, 10)
-        offset = randint * 100
+        #randint = random.randint(1, 10)
+        #offset = randint * 100
+        
+        offset = random.randint(1, 100000)
+        
         print(offset)
         scraper.CV_offset = offset
         #call it
@@ -365,10 +369,8 @@ def main():
         
         if(df_result is not None):
             
-            print(scraper.CV_query_URL)
-            
             #print(df_result.iloc[0:10,3:8])
-            print(df_result['volume.name'][3:7])
+            print(df_result['volume.name'][3:10])
             print("sleep at: {}".format(datetime.datetime.now()))
             time.sleep(3)  #paramter is in SECONDS    
         
