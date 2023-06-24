@@ -170,8 +170,10 @@ class ComicvineAPI_scraper:
                         logfile.write(str(datetime.datetime.now()) + " no more results from API call.\n")
                         sys.exit()
                 
-                #ACTION: CALL THE process_JSON METHOD HERE
-                    self._CV_processed_json = self.process_JSON(obj_json)
+                
+                    #self._CV_processed_json = self.process_JSON(obj_json)
+                    self.process_JSON(obj_json)
+                    
                     logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
                      
                     #return json_processed #return a json object
@@ -260,7 +262,9 @@ class ComicvineAPI_scraper:
         #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
         with open(self.path_output + "temp_json.json",'r') as file_json:
             json_formatted = json.loads(file_json.read())
-            return json_formatted #return a json object
+            
+            #set from a formatted json object
+            self._CV_processed_json = json_formatted
     #end of process_JSON()
     
     def build_query_string( self ):
@@ -358,8 +362,6 @@ def main():
     
     scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues',400)
     
-    clientcode()
-
     for i in range(1, 100):
         
         #generate a random offset and use it
@@ -370,8 +372,10 @@ def main():
         
         print("random number offset: {}".format(offset))
         scraper.CV_offset = offset
+        print("instance variable CV_offset: {}".format(scraper.CV_offset))
         #call it
         scraper.make_request()
+        print(scraper.CV_query_URL)
         
         df_result = scraper.df_json_CV
         
