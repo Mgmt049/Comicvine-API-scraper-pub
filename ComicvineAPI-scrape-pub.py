@@ -135,46 +135,9 @@ class ComicvineAPI_scraper:
     #thus, you should only do this when you intend to create a read-only attribute with NO setting 
     def df_json_CV(self):        
         return self.df_json_CV
-    
+
+#end of class inits
 # =============================================================================
-# def load_previous(dir_output):
-#     #to mark when previous dataset is loaded:
-#     ts_start = datetime.datetime.now()
-#     print("timestamp pulled in load_previous:", ts_start)
-#     
-#     dir_output = dir_output+'Comicvine.xlsx'
-#     
-#     #setup the error log:
-#     with open(GLOBALS["path_output"]+GLOBALS["APIlog_file"], mode="a") as err_file:
-#         try:
-# 
-#             #you must specify index_col=0 to prevent new indexes from being created
-#             full_data = pd.read_excel(dir_output, index_col=0)
-#             print("dataframe shape in load_previous: ", full_data.shape)
-#             ts_postload = datetime.datetime.now()
-# 
-#             print("it took this long? {}\n".format(ts_postload - ts_start))
-#             
-#             #return a dataframe    
-#             return full_data
-#         
-#         except FileNotFoundError as e:
-#             print("this the FNF error", e)
-#             err_file.write("{} this the FNF error {} \n".format(datetime.datetime.now(), e) )
-#             sys.exit() #terminate the whole program
-#         except IOError as io:
-#             print("this the IO error: ", io)
-#             #err_file.write("this the IO error", datetime.datetime.now())
-#             err_file.write("{} this the IO error {} \n".format(datetime.datetime.now(), io) )
-#             sys.exit() #terminate the whole program
-# 
-# 
-
-
-# def calc_offset(df):
-#     #The end of the "characters" resource list is ~149150
-#     #use len() to return number of rows
-#     return ( len(df) + 1 )
 
     def execute_get(self):
         #this function actually executes the API call, get()
@@ -263,6 +226,8 @@ class ComicvineAPI_scraper:
         #end of make_request()   
 
     def normalize_df(self):
+        
+        #ACTION: implement a try-except for NotImplementedError in normalize_df() among other exceptions
         #set the instance variable dataframe to the converted get() result
      
         #grab the current date for timestamping
@@ -310,6 +275,45 @@ class ComicvineAPI_scraper:
     
     #end of build_query_string()
 
+#end of class ComicvineAPI_scraper
+#################################################################################################################
+
+# def load_previous(dir_output):
+#     #to mark when previous dataset is loaded:
+#     ts_start = datetime.datetime.now()
+#     print("timestamp pulled in load_previous:", ts_start)
+#     
+#     dir_output = dir_output+'Comicvine.xlsx'
+#     
+#     #setup the error log:
+#     with open(GLOBALS["path_output"]+GLOBALS["APIlog_file"], mode="a") as err_file:
+#         try:
+# 
+#             #you must specify index_col=0 to prevent new indexes from being created
+#             full_data = pd.read_excel(dir_output, index_col=0)
+#             print("dataframe shape in load_previous: ", full_data.shape)
+#             ts_postload = datetime.datetime.now()
+# 
+#             print("it took this long? {}\n".format(ts_postload - ts_start))
+#             
+#             #return a dataframe    
+#             return full_data
+#         
+#         except FileNotFoundError as e:
+#             print("this the FNF error", e)
+#             err_file.write("{} this the FNF error {} \n".format(datetime.datetime.now(), e) )
+#             sys.exit() #terminate the whole program
+#         except IOError as io:
+#             print("this the IO error: ", io)
+#             #err_file.write("this the IO error", datetime.datetime.now())
+#             err_file.write("{} this the IO error {} \n".format(datetime.datetime.now(), io) )
+#             sys.exit() #terminate the whole program
+#
+# def calc_offset(df):
+#     #The end of the "characters" resource list is ~149150
+#     #use len() to return number of rows
+#     return ( len(df) + 1 )
+#
 # def combine_dfs(dfs):
 #     #concat must be passed an "iterable"/"array" of Dataframe objects, I believe ignore_index is
 #     #necessary for re-numbering the index
@@ -346,11 +350,15 @@ class ComicvineAPI_scraper:
 #             err_file.write("{} this the IO error {} ".format(datetime.datetime.now(), io) )
 #             sys.exit() #terminate the whole program 
 
+    
+def clientcode():
+    print("this is a client code function call")
+
 def main():
     
     scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues',400)
     
-    #print(scraper.path_output)    
+    clientcode()
 
     for i in range(1, 100):
         
@@ -360,12 +368,14 @@ def main():
         
         offset = random.randint(1, 100000)
         
-        print(offset)
+        print("random number offset: {}".format(offset))
         scraper.CV_offset = offset
         #call it
         scraper.make_request()
         
         df_result = scraper.df_json_CV
+        
+        print("shape of dataframe: {}".format(df_result.shape))
         
         if(df_result is not None):
             
@@ -376,5 +386,3 @@ def main():
         
 if __name__ == "__main__":
     main()
-
-# =============================================================================
