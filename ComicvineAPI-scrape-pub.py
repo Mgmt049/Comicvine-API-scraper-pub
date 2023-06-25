@@ -230,6 +230,46 @@ class ComicvineAPI_scraper:
                 print("a InvalidURL error occured: {} \n".format(e))
         #end of make_request()   
 
+    def process_JSON(self, obj_json):
+        
+        try: 
+            #this method is to do a JSON "swap" that is necessary for usable JSON
+            
+            # #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
+    
+            # with open(self.path_output + "temp_json.json", "w") as file_json:
+                 # file_json.write(obj_json)
+            
+            #obj_json = pd.json_normalize(json.loads(obj_json))
+            
+            # #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
+            # with open(self.path_output + "temp_json.json",'r') as file_json:
+            #     json_formatted = json.loads(file_json.read())
+            #     #set from a formatted json object
+            #     self._CV_processed_json = json_formatted
+            
+            #06242023 TEMPORARY EXPERIMENT: 
+            #####NEXT TRY WRITING TO THE TEMP FILE AND EYEBALL THE RESULTS
+            #json_formatted = json.loads(obj_json)
+            
+            #json_formatted = pd.json_normalize(json.loads( obj_json ))
+            
+            #create a DataFrame from the normalized JSON
+            #https://stackoverflow.com/questions/68864871/why-does-pandas-json-normalizejson-results-raise-a-notimplementederror
+            #self._CV_processed_json = pd.json_normalize(json.loads( obj_json ), record_path =['results'],meta=['error', 'limit', 'offset'])
+            self.df_json_CV = pd.json_normalize(json.loads( obj_json ), record_path =['results'],meta=['error', 'limit', 'offset'])
+            
+            with open(self.path_output + "temp_json.json", "w") as file_json:
+                file_json.write(obj_json)          
+            
+            
+            print("dataframe in process_json(): /n", self._CV_processed_json.shape)
+            
+        except Exception as e:
+            print("general exception in process_JSON(): {} \n".format(e))
+        
+    #end of process_JSON()
+
     def normalize_df(self):
         
         #ACTION: implement a try-except for NotImplementedError in normalize_df() among other exceptions
@@ -245,7 +285,8 @@ class ComicvineAPI_scraper:
         #df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
         
         #create a DataFrame from the normalized JSON
-        self.df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
+        
+        #self.df_json_CV = pd.json_normalize(self._CV_processed_json, record_path =['results'],meta=['error', 'limit', 'offset'])
         
         #append the timestamp column onto the dataframe
         
@@ -256,37 +297,6 @@ class ComicvineAPI_scraper:
     
     #end of normalize_df()
     
-    def process_JSON(self, obj_json):
-        try: 
-            #this method is to do a JSON "swap" that is necessary for usable JSON
-            
-            # #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
-    
-            with open(self.path_output + "temp_json.json", "w") as file_json:
-                 file_json.write(obj_json)
-            
-            #obj_json = pd.json_normalize(json.loads(obj_json))
-            
-            # #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
-            # with open(self.path_output + "temp_json.json",'r') as file_json:
-            #     json_formatted = json.loads(file_json.read())
-            #     #set from a formatted json object
-            #     self._CV_processed_json = json_formatted
-            
-            #06242023 TEMPORARY EXPERIMENT: 
-            #####NEXT TRY WRITING TO THE TEMP FILE AND EYEBALL THE RESULTS
-            #json_formatted = json.loads(obj_json)
-            
-            #https://stackoverflow.com/questions/68864871/why-does-pandas-json-normalizejson-results-raise-a-notimplementederror
-            json_formatted = pd.json_normalize(json.loads( obj_json ))
-            self._CV_processed_json = json_formatted
-            
-            print("dataframe in process_json(): ", self._CV_processed_json.iloc[0:10,3:20])
-            
-        except Exception as e:
-            print("general exception in process_JSON(): {} \n".format(e))
-        
-    #end of process_JSON()
     
     def build_query_string( self ):
         
@@ -402,8 +412,8 @@ def main():
             
             print("shape of dataframe: {}".format(df_result.shape))
             
-            print(df_result.iloc[0:10,3:20])
-            print(df_result['volume.name'][3:10])
+            print(df_result.iloc[0:10,15:25])
+            #print(df_result['volume.name'][3:10])
             print("sleep at: {}".format(datetime.datetime.now()))
             time.sleep(3)  #paramter is in SECONDS    
         
