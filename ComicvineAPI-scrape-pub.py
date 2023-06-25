@@ -206,7 +206,7 @@ class ComicvineAPI_scraper:
                     time_to_wait = datetime.datetime.now() - self.CV_timestamp
                     
                     if(time_to_wait / datetime.timedelta(seconds=1) < self.CV_wait_time):  #you are only allowed 200 Comicvine calls per hour per resource
-                        print("cannot get() YET! - time since last GET() is {}, current time is {}".format( time_to_wait / datetime.timedelta(seconds=1),datetime.datetime.now() ) )
+                        print("Too early to execute a get(): time since last GET() is {}, current time is {}".format( time_to_wait / datetime.timedelta(seconds=1),datetime.datetime.now() ) )
                         return
                 
                 #ACTION: figure out the offset problem and then do a git commit
@@ -256,15 +256,27 @@ class ComicvineAPI_scraper:
     def process_JSON(self, obj_json):
         #this method is to do a JSON "swap" that is necessary for usable JSON
         
-        #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
+        # #there was a valid response, so handle the temporary JSON - do a WRITE and then an immediate READ
+
         with open(self.path_output + "temp_json.json", "w") as file_json:
-            file_json.write(obj_json)
-        #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
-        with open(self.path_output + "temp_json.json",'r') as file_json:
-            json_formatted = json.loads(file_json.read())
-            
-            #set from a formatted json object
-            self._CV_processed_json = json_formatted
+             file_json.write(obj_json)
+        
+        #obj_json = pd.json_normalize(json.loads(obj_json))
+        
+        # #You use json.loads to convert a JSON string into Python objects needed  to read nested columns
+        # with open(self.path_output + "temp_json.json",'r') as file_json:
+        #     json_formatted = json.loads(file_json.read())
+        #     #set from a formatted json object
+        #     self._CV_processed_json = json_formatted
+        
+        #06242023 TEMPORARY EXPERIMENT: 
+        #####NEXT TRY WRITING TO THE TEMP FILE AND EYEBALL THE RESULTS
+        #json_formatted = json.loads(obj_json)
+        json_formatted = pd.json_normalize(json.loads( obj_json ))
+        #https://stackoverflow.com/questions/68864871/why-does-pandas-json-normalizejson-results-raise-a-notimplementederror
+        self._CV_processed_json = json_formatted
+        
+        
     #end of process_JSON()
     
     def build_query_string( self ):
@@ -355,9 +367,6 @@ class ComicvineAPI_scraper:
 #             sys.exit() #terminate the whole program 
 
     
-def clientcode():
-    print("this is a client code function call")
-
 def main():
     
     scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues',400)
@@ -370,20 +379,21 @@ def main():
         
         offset = random.randint(1, 100000)
         
-        print("random number offset: {}".format(offset))
+        #print("random number offset: {}".format(offset))
         scraper.CV_offset = offset
-        print("instance variable CV_offset: {}".format(scraper.CV_offset))
+        
         #call it
         scraper.make_request()
         print(scraper.CV_query_URL)
         
         df_result = scraper.df_json_CV
-        
-        print("shape of dataframe: {}".format(df_result.shape))
+    
         
         if(df_result is not None):
             
-            #print(df_result.iloc[0:10,3:8])
+            print("shape of dataframe: {}".format(df_result.shape))
+            
+            print(df_result.iloc[0:10,3:20])
             print(df_result['volume.name'][3:10])
             print("sleep at: {}".format(datetime.datetime.now()))
             time.sleep(3)  #paramter is in SECONDS    
