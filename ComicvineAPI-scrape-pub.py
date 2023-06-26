@@ -55,7 +55,7 @@ class ComicvineAPI_scraper:
         #private attributes:         #Prefixing with '_' indicates it's a private attribute
         #self._CV_timestamp = None #set to the current time of obj. construction
         self.CV_timestamp = None #set to the current time of obj. construction
-        self._CV_processed_json = None
+        #self._CV_processed_json = None
 
     #end of __init__
     
@@ -219,7 +219,6 @@ class ComicvineAPI_scraper:
                 self.process_JSON(obj_json)                
                 
                 self.timestamp_df()
-                #return df_API_result
                 
             except requests.Timeout as e:
                 print("a Timeout error occured: {} \n".format(e))
@@ -240,10 +239,11 @@ class ComicvineAPI_scraper:
             #self._CV_processed_json = pd.json_normalize(json.loads( obj_json ), record_path =['results'],meta=['error', 'limit', 'offset'])
             self.df_json_CV = pd.json_normalize(json.loads( obj_json ), record_path =['results'],meta=['error', 'limit', 'offset'])
             
+            #write the temporary JSON for now - just for debugging purposes
             with open(self.path_output + "temp_json.json", "w") as file_json:
                 file_json.write(obj_json)          
             
-            print("dataframe in process_json(): /n", self._CV_processed_json.shape)
+            print("dataframe in process_json(): /n", self.df_json_CV.shape)
             
         except Exception as e:
             print("general exception in process_JSON(): {} \n".format(e))
@@ -259,15 +259,15 @@ class ComicvineAPI_scraper:
             #grab the current date for timestamping
             formatted_date = datetime.datetime.now()
             formatted_date = formatted_date.strftime('%M-%D-%Y')
-            #print("timestamp pulled in normalize_df() %s"%(datetime.datetime.now()))
             
-            #append the timestamp column onto the dataframe
-            
+            #append the timestamp column onto the dataframe     
             self.df_json_CV['TS_pulled'] = formatted_date
     
         except Exception as e:
             print("general exception in timestamp_df(): {} \n".format(e))
-    #end of normalize_df()
+        except pd.notimplementederror as nie:
+            print("notimplementederror in timestampt_df(): {} \n".format(nie))
+    #end of timestamp_df()
     
     
     def build_query_string( self ):
@@ -284,7 +284,8 @@ class ComicvineAPI_scraper:
 
 #end of class ComicvineAPI_scraper
 #################################################################################################################
-
+#################################################################################################################
+#start of client code:    
 # def load_previous(dir_output):
 #     #to mark when previous dataset is loaded:
 #     ts_start = datetime.datetime.now()
@@ -326,68 +327,66 @@ class ComicvineAPI_scraper:
 #     #necessary for re-numbering the index
 #     return pd.concat(dfs, axis=0, ignore_index=True)
 # 
-# def write_results(df_full_data, path_output):
-#     #setup the error log:
-#     with open(GLOBALS["APIlog_file"], mode="a") as err_file:
-# 
-#         path_output = path_output + "Comicvine.xlsx"        
-# 
-#         try:
-#             
-#             #quickly create a backup file
-#             sh.copy2(path_output, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\Comicvine_bak.xlsx')
-#             
-#             #df_full_data.to_excel(path_output)
-#     
-#             #Excel threw a hard limit on 65K+ URLS error, so i had to use Excelwriter() and ingore URLs instead of .toExcel()
-#             #https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html
-#             #https://stackoverflow.com/questions/55280131/no-module-named-xlsxwriter-error-while-writing-pandas-df-to-excel/55280686
-#             #https://stackoverflow.com/questions/71144242/which-arguments-is-futurewarning-use-of-kwargs-is-deprecated-use-engine-kwa
-#             with pd.ExcelWriter(path_output, engine='xlsxwriter', engine_kwargs={'options':{'strings_to_urls': False}}) as writer:
-#                 df_full_data.to_excel(writer)
-#             
-#             print("timestamp pulled in write_results() %s"%(datetime.datetime.now()))
-# 
-#         except FileNotFoundError as e:
-#             print("this the FNF error", e)
-#             err_file.write("{} this the FNF error {} ".format(datetime.datetime.now(), e) )
-#             sys.exit() #terminate the whole program
-#         except IOError as io:
-#             print("this the IO error: ", io)
-#             err_file.write("{} this the IO error {} ".format(datetime.datetime.now(), io) )
-#             sys.exit() #terminate the whole program 
+def write_results(df_full_data, path_output):
+    #setup the error log:
+    #with open(GLOBALS["APIlog_file"], mode="a") as err_file:
+    with open(path_output + "APIlog_file", mode="a") as err_file:
+
+        path_output = path_output + "Comicvine_class.xlsx"        
+
+        try:
+            
+            #quickly create a backup file
+            #sh.copy2(path_output, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\Comicvine_bak.xlsx')
+    
+            #Excel threw a hard limit on 65K+ URLS error, so i had to use Excelwriter() and ingore URLs instead of .toExcel()
+            #https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html
+            #https://stackoverflow.com/questions/55280131/no-module-named-xlsxwriter-error-while-writing-pandas-df-to-excel/55280686
+            #https://stackoverflow.com/questions/71144242/which-arguments-is-futurewarning-use-of-kwargs-is-deprecated-use-engine-kwa
+            with pd.ExcelWriter(path_output, engine='xlsxwriter', engine_kwargs={'options':{'strings_to_urls': False}}) as writer:
+                df_full_data.to_excel(writer)
+            
+            print("timestamp pulled in write_results() %s"%(datetime.datetime.now()))
+
+        except FileNotFoundError as e:
+            print("this the FNF error", e)
+            err_file.write("{} this the FNF error {} ".format(datetime.datetime.now(), e) )
+            sys.exit() #terminate the whole program
+        except IOError as io:
+            print("this the IO error: ", io)
+            err_file.write("{} this the IO error {} ".format(datetime.datetime.now(), io) )
+            sys.exit() #terminate the whole program 
 
     
 def main():
     
     scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues',400)
     
-    for i in range(1, 100):
+    #for i in range(1, 100):
         
-        #generate a random offset and use it
-        #randint = random.randint(1, 10)
-        #offset = randint * 100
-        
-        offset = random.randint(1, 100000)
-        
-        #print("random number offset: {}".format(offset))
-        scraper.CV_offset = offset
-        
-        #call it
-        scraper.make_request()
-        print(scraper.CV_query_URL)
-        
-        df_result = scraper.df_json_CV
+    offset = random.randint(1, 100000)
     
+    #print("random number offset: {}".format(offset))
+    scraper.CV_offset = offset
+    
+    #call it
+    scraper.make_request()
+    print(scraper.CV_query_URL)
         
-        if(df_result is not None):
+    df_result = scraper.df_json_CV
+    
+    if(df_result is not None):
+        
+        write_results(df_result, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\')         
+    
+        # if(df_result is not None):
             
-            print("shape of dataframe: {}".format(df_result.shape))
+        #     print("shape of dataframe: {}".format(df_result.shape))
             
-            print(df_result.iloc[0:10,15:26])
-            #print(df_result['volume.name'][3:10])
-            print("sleep at: {}".format(datetime.datetime.now()))
-            time.sleep(3)  #paramter is in SECONDS    
+        #     print(df_result.iloc[0:10,15:26])
+        #     #print(df_result['volume.name'][3:10])
+        #     print("sleep at: {}".format(datetime.datetime.now()))
+        #     time.sleep(3)  #paramter is in SECONDS    
         
 if __name__ == "__main__":
     main()
