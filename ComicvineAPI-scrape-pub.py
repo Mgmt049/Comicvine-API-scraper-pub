@@ -209,11 +209,9 @@ class ComicvineAPI_scraper:
                         print("Too early to execute a get(): time since last GET() is {}, current time is {}".format( time_to_wait / datetime.timedelta(seconds=1),datetime.datetime.now() ) )
                         return
                 
-                #ACTION: figure out the offset problem and then do a git commit
-                #store the timestamp for banning safety and commence the actual get()               
-                #self._CV_timestamp = datetime.datetime.now()
                 self.CV_timestamp = datetime.datetime.now()
                 
+                #ACTION: handle the scenario of a non-200 response and PERSIST, maybe using an instance attribute that holds the JSON
                 obj_json = self.execute_get()
                                 
                 self.process_JSON(obj_json)                
