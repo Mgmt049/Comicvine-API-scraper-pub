@@ -155,15 +155,23 @@ class ComicvineAPI_scraper:
                 #print("full query string/endpoint: {}".format(self._CV_query_URL))
                 
                 #CV_resp = requests.get(self.full_endpt, headers = self.headers)
+                #CV_resp = requests.get(self._CV_query_URL, headers = self.headers)
+                
+                attributes_CV_resp = {} #define dict
+                
                 CV_resp = requests.get(self._CV_query_URL, headers = self.headers)
                     
                 #a response of 200 is OK
                 print("GET response at {}: {}".format(datetime.datetime.now(), CV_resp))
                 
+                attributes_CV_resp["response_code"] = CV_resp.status_code #populate dict
+                
                 if CV_resp.status_code == 200: #test for succesful response
     
                 #NOTE: you must use the .json() or json.dumps() methods to ensure the object is serializable
                     obj_json = json.dumps(CV_resp.json(), indent=4)
+                    
+                    attributes_CV_resp["response_JSON"] = json.dumps(CV_resp.json(), indent=4) #populate dict
                      
                     if not CV_resp:
                         print("no more results from API call.")
@@ -175,9 +183,9 @@ class ComicvineAPI_scraper:
                     
                     logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
                     
-                    return obj_json
-                     
-                    #return json_processed #return a json object
+                    print("attributes_CV_resp: {}".format(attributes_CV_resp["response code"]))
+                    
+                    return obj_json #return a json object
                             
                 else: 
                      print("bad response, write to log file...")
