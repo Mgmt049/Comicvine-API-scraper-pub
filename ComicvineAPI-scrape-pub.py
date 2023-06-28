@@ -183,7 +183,7 @@ class ComicvineAPI_scraper:
                     
                     logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
                     
-                    print("attributes_CV_resp: {}".format(attributes_CV_resp["response code"]))
+                    print("attributes_CV_resp: {}".format(attributes_CV_resp["response_code"]))
                     
                     return obj_json #return a json object
                             
