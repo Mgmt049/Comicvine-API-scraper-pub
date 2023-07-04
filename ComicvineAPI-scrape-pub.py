@@ -180,7 +180,7 @@ class ComicvineAPI_scraper:
                         logfile.write(str(datetime.datetime.now()) + " no more results from API call.\n")
                         sys.exit()
                     
-                    logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
+                    #logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
                     
                     print("attributes_CV_resp: {}".format(self.attributes_CV_resp["response_code"]))
                             
@@ -214,16 +214,15 @@ class ComicvineAPI_scraper:
                         return
                 
                 self.CV_timestamp = datetime.datetime.now()
+                self.execute_get() #tore the timestamp to the instance attribute
                 
-                #ACTION: handle the scenario of a non-200 response and PERSIST, maybe using an instance attribute that holds the JSON
-                #obj_json = self.execute_get()
-                self.execute_get()
+                if (self.attributes_CV_resp["response_code"]  == 200 ):
+                    logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
+                    self.process_JSON()                
+                    self.timestamp_df()
                 
-                
-                                
-                self.process_JSON()                
-                
-                self.timestamp_df()
+                else: 
+                    "non-200 API response, continuing..."
                 
             except requests.Timeout as e:
                 print("a Timeout error occured: {} \n".format(e))
