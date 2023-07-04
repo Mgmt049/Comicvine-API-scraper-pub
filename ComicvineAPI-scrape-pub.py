@@ -56,6 +56,9 @@ class ComicvineAPI_scraper:
         #self._CV_timestamp = None #set to the current time of obj. construction
         self.CV_timestamp = None #set to the current time of obj. construction
         #self._CV_processed_json = None
+        
+        #dict to hold response code and response JSON
+        self.attributes_CV_resp = {}
 
     #end of __init__
     
@@ -135,6 +138,10 @@ class ComicvineAPI_scraper:
     #thus, you should only do this when you intend to create a read-only attribute with NO setting 
     def df_json_CV(self):        
         return self.df_json_CV
+    
+    #not using a property decorator since I do not want to have a getter/setter pair for this "private"
+    def attributes_CV_resp(self):
+        return self.attributes_CV_resp
 
 #end of class inits
 # =============================================================================
@@ -157,21 +164,21 @@ class ComicvineAPI_scraper:
                 #CV_resp = requests.get(self.full_endpt, headers = self.headers)
                 #CV_resp = requests.get(self._CV_query_URL, headers = self.headers)
                 
-                attributes_CV_resp = {} #define dict
+                #attributes_CV_resp = {} #define dict
                 
                 CV_resp = requests.get(self._CV_query_URL, headers = self.headers)
                     
                 #a response of 200 is OK
                 print("GET response at {}: {}".format(datetime.datetime.now(), CV_resp))
                 
-                attributes_CV_resp["response_code"] = CV_resp.status_code #populate dict
+                self.attributes_CV_resp["response_code"] = CV_resp.status_code #populate dict
                 
                 if CV_resp.status_code == 200: #test for succesful response
     
                 #NOTE: you must use the .json() or json.dumps() methods to ensure the object is serializable
                     obj_json = json.dumps(CV_resp.json(), indent=4)
                     
-                    attributes_CV_resp["response_JSON"] = json.dumps(CV_resp.json(), indent=4) #populate dict
+                    self.attributes_CV_resp["response_JSON"] = json.dumps(CV_resp.json(), indent=4) #populate dict
                      
                     if not CV_resp:
                         print("no more results from API call.")
@@ -183,7 +190,7 @@ class ComicvineAPI_scraper:
                     
                     logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
                     
-                    print("attributes_CV_resp: {}".format(attributes_CV_resp["response_code"]))
+                    print("attributes_CV_resp: {}".format(self.attributes_CV_resp["response_code"]))
                     
                     return obj_json #return a json object
                             
