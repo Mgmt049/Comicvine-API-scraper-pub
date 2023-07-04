@@ -161,11 +161,6 @@ class ComicvineAPI_scraper:
                 
                 #print("full query string/endpoint: {}".format(self._CV_query_URL))
                 
-                #CV_resp = requests.get(self.full_endpt, headers = self.headers)
-                #CV_resp = requests.get(self._CV_query_URL, headers = self.headers)
-                
-                #attributes_CV_resp = {} #define dict
-                
                 CV_resp = requests.get(self._CV_query_URL, headers = self.headers)
                     
                 #a response of 200 is OK
@@ -176,7 +171,7 @@ class ComicvineAPI_scraper:
                 if CV_resp.status_code == 200: #test for succesful response
     
                 #NOTE: you must use the .json() or json.dumps() methods to ensure the object is serializable
-                    obj_json = json.dumps(CV_resp.json(), indent=4)
+                    #obj_json = json.dumps(CV_resp.json(), indent=4)
                     
                     self.attributes_CV_resp["response_JSON"] = json.dumps(CV_resp.json(), indent=4) #populate dict
                      
@@ -184,15 +179,10 @@ class ComicvineAPI_scraper:
                         print("no more results from API call.")
                         logfile.write(str(datetime.datetime.now()) + " no more results from API call.\n")
                         sys.exit()
-                
-                    #self._CV_processed_json = self.process_JSON(obj_json)
-                    #self.process_JSON(obj_json)
                     
                     logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
                     
                     print("attributes_CV_resp: {}".format(self.attributes_CV_resp["response_code"]))
-                    
-                    return obj_json #return a json object
                             
                 else: 
                      print("bad response, write to log file...")
@@ -216,8 +206,7 @@ class ComicvineAPI_scraper:
                 #if(self._CV_timestamp is not None): #this is the first get() request for the object instance
                 if(self.CV_timestamp is not None): #this is the first get() request for the object instance
                 
-                    #you have to do some kind of modulo for timedelta???
-                    #time_to_wait = datetime.datetime.now() - self._CV_timestamp
+                    #you have to do some kind of modulo for timedelta
                     time_to_wait = datetime.datetime.now() - self.CV_timestamp
                     
                     if(time_to_wait / datetime.timedelta(seconds=1) < self.CV_wait_time):  #you are only allowed 200 Comicvine calls per hour per resource
@@ -229,6 +218,8 @@ class ComicvineAPI_scraper:
                 #ACTION: handle the scenario of a non-200 response and PERSIST, maybe using an instance attribute that holds the JSON
                 #obj_json = self.execute_get()
                 self.execute_get()
+                
+                
                                 
                 self.process_JSON()                
                 
@@ -376,7 +367,7 @@ def write_results(df_full_data, path_output):
     
 def main():
     
-    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues',400)
+    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues', 400)
     
     #for i in range(1, 100):
         
@@ -385,9 +376,9 @@ def main():
     #print("random number offset: {}".format(offset))
     scraper.CV_offset = offset
     
-    #call it
+    #initiate a get() to the API 
     scraper.make_request()
-    print(scraper.CV_query_URL)
+    #print(scraper.CV_query_URL)
         
     df_result = scraper.df_json_CV
     
