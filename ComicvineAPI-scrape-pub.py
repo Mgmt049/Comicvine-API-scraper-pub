@@ -51,7 +51,7 @@ class ComicvineAPI_scraper:
         self.resp_format = "&format=json"
         self.CV_query_URL = None
         #this is the dataFrame that will be exposed to the client code for easy retreival
-        self.df_json_CV = None
+        self.df_CV = None
         #private attributes:         #Prefixing with '_' indicates it's a private attribute
         #self._CV_timestamp = None #set to the current time of obj. construction
         self.CV_timestamp = None #set to the current time of obj. construction
@@ -136,12 +136,12 @@ class ComicvineAPI_scraper:
     #but omit the setter method for a READ-ONLY attribute,  
     #attempting to modify it will result in an "AttributeError: can't set attribute"
     #thus, you should only do this when you intend to create a read-only attribute with NO setting 
-    def df_json_CV(self):        
-        return self.df_json_CV
+    def df_CV(self):        
+        return self.df_CV
     
     #not using a property decorator since I do not want to have a getter/setter pair for this "private"
     def attributes_CV_resp(self):
-        return self.attributes_CV_resp
+        return self._attributes_CV_resp
 
 #end of class inits
 # =============================================================================
@@ -154,12 +154,8 @@ class ComicvineAPI_scraper:
             try:
                 print("execute_get() at {}".format(datetime.datetime.now())) 
                 
-                #self.CV_query_string = self.build_query_string()
-                
                 #build the query string (a "private" variable)
                 self.build_query_string()
-                
-                #print("full query string/endpoint: {}".format(self._CV_query_URL))
                 
                 CV_resp = requests.get(self._CV_query_URL, headers = self.headers)
                     
@@ -171,7 +167,6 @@ class ComicvineAPI_scraper:
                 if CV_resp.status_code == 200: #test for succesful response
     
                 #NOTE: you must use the .json() or json.dumps() methods to ensure the object is serializable
-                    #obj_json = json.dumps(CV_resp.json(), indent=4)
                     
                     self.attributes_CV_resp["response_JSON"] = json.dumps(CV_resp.json(), indent=4) #populate dict
                      
@@ -179,10 +174,6 @@ class ComicvineAPI_scraper:
                         print("no more results from API call.")
                         logfile.write(str(datetime.datetime.now()) + " no more results from API call.\n")
                         sys.exit()
-                    
-                    #logfile.write("{} JSON was successfully retrieved from endpt...\n".format(datetime.datetime.now()))
-                    
-                    print("attributes_CV_resp: {}".format(self.attributes_CV_resp["response_code"]))
                             
                 else: 
                      print("bad response, write to log file...")
@@ -232,24 +223,21 @@ class ComicvineAPI_scraper:
                 print("a InvalidURL error occured: {} \n".format(e))
         #end of make_request()   
 
-    #def process_JSON(self, obj_json):
     def process_JSON(self):
-        
+    # there was a valid response, so normalize the temporary JSON        
         try: 
-            
-            # there was a valid response, so handle the temporary JSON
+
             # You use json.loads to convert a JSON string into Python objects needed  to read nested columns
             # creating a DataFrame from the normalized JSON
             #https://stackoverflow.com/questions/68864871/why-does-pandas-json-normalizejson-results-raise-a-notimplementederror
-            #self._CV_processed_json = pd.json_normalize(json.loads( obj_json ), record_path =['results'],meta=['error', 'limit', 'offset'])
-            self.df_json_CV = pd.json_normalize(json.loads( self.attributes_CV_resp["response_JSON"] ), record_path =['results'],meta=['error', 'limit', 'offset'])
+            
+            self.df_CV = pd.json_normalize(json.loads( self.attributes_CV_resp["response_JSON"] ), record_path =['results'],meta=['error', 'limit', 'offset'])
             
             #write the temporary JSON for now - just for debugging purposes
             with open(self.path_output + "temp_json.json", "w") as file_json:
-                #file_json.write(obj_json)
                 file_json.write( self.attributes_CV_resp["response_JSON"] )
             
-            print("dataframe in process_json(): /n", self.df_json_CV.shape)
+            print("dataframe in process_json(): /n", self.df_CV.shape)
             
         except Exception as e:
             print("general exception in process_JSON(): {} \n".format(e))
@@ -267,7 +255,7 @@ class ComicvineAPI_scraper:
             formatted_date = formatted_date.strftime('%M-%D-%Y')
             
             #append the timestamp column onto the dataframe     
-            self.df_json_CV['TS_pulled'] = formatted_date
+            self.df_CV['TS_pulled'] = formatted_date
     
         except Exception as e:
             print("general exception in timestamp_df(): {} \n".format(e))
@@ -378,11 +366,15 @@ def main():
     #initiate a get() to the API 
     scraper.make_request()
     #print(scraper.CV_query_URL)
-        
-    df_result = scraper.df_json_CV
     
-    if(df_result is not None):
+    print("attributes_CV_resp code in client code: {}".format(scraper.attributes_CV_resp["response_code"]))
+    
+    print(scraper.attributes_CV_resp)
         
+    df_result = scraper.df_CV
+    
+    #if(df_result is not None):
+    if(scraper.attributes_CV_resp["response_code"] == 200):       
         write_results(df_result, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\')         
     
         # if(df_result is not None):
