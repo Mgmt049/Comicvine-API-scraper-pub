@@ -227,9 +227,10 @@ class ComicvineAPI_scraper:
                 self.CV_timestamp = datetime.datetime.now()
                 
                 #ACTION: handle the scenario of a non-200 response and PERSIST, maybe using an instance attribute that holds the JSON
-                obj_json = self.execute_get()
+                #obj_json = self.execute_get()
+                self.execute_get()
                                 
-                self.process_JSON(obj_json)                
+                self.process_JSON()                
                 
                 self.timestamp_df()
                 
@@ -241,7 +242,8 @@ class ComicvineAPI_scraper:
                 print("a InvalidURL error occured: {} \n".format(e))
         #end of make_request()   
 
-    def process_JSON(self, obj_json):
+    #def process_JSON(self, obj_json):
+    def process_JSON(self):
         
         try: 
             
@@ -250,11 +252,12 @@ class ComicvineAPI_scraper:
             # creating a DataFrame from the normalized JSON
             #https://stackoverflow.com/questions/68864871/why-does-pandas-json-normalizejson-results-raise-a-notimplementederror
             #self._CV_processed_json = pd.json_normalize(json.loads( obj_json ), record_path =['results'],meta=['error', 'limit', 'offset'])
-            self.df_json_CV = pd.json_normalize(json.loads( obj_json ), record_path =['results'],meta=['error', 'limit', 'offset'])
+            self.df_json_CV = pd.json_normalize(json.loads( self.attributes_CV_resp["response_JSON"] ), record_path =['results'],meta=['error', 'limit', 'offset'])
             
             #write the temporary JSON for now - just for debugging purposes
             with open(self.path_output + "temp_json.json", "w") as file_json:
-                file_json.write(obj_json)          
+                #file_json.write(obj_json)
+                file_json.write( self.attributes_CV_resp["response_JSON"] )
             
             print("dataframe in process_json(): /n", self.df_json_CV.shape)
             
