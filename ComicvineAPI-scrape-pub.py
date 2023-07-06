@@ -141,7 +141,7 @@ class ComicvineAPI_scraper:
     
     #not using a property decorator since I do not want to have a getter/setter pair for this "private"
     def attributes_CV_resp(self):
-        return self._attributes_CV_resp
+        return self.attributes_CV_resp
 
 #end of class inits
 # =============================================================================
@@ -356,35 +356,32 @@ def main():
     
     scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues', 400)
     
-    #for i in range(1, 100):
+    for i in range(1, 100):
+    
+        offset = random.randint(1, 100000)
         
-    offset = random.randint(1, 100000)
-    
-    #print("random number offset: {}".format(offset))
-    scraper.CV_offset = offset
-    
-    #initiate a get() to the API 
-    scraper.make_request()
-    #print(scraper.CV_query_URL)
-    
-    print("attributes_CV_resp code in client code: {}".format(scraper.attributes_CV_resp["response_code"]))
-    
-    print(scraper.attributes_CV_resp)
+        #print("random number offset: {}".format(offset))
+        scraper.CV_offset = offset
         
-    df_result = scraper.df_CV
-    
-    #if(df_result is not None):
-    if(scraper.attributes_CV_resp["response_code"] == 200):       
-        write_results(df_result, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\')         
-    
-        # if(df_result is not None):
+        #initiate a get() to the API 
+        scraper.make_request()
+        #print(scraper.CV_query_URL)
+        
+        print("attributes_CV_resp code in client code: {}".format(scraper.attributes_CV_resp["response_code"]))
+               
+        df_result = scraper.df_CV
+           
+        if(scraper.attributes_CV_resp["response_code"] == 200):       
+            write_results(df_result, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\')         
+        
+        #if(df_result is not None):
             
-        #     print("shape of dataframe: {}".format(df_result.shape))
+            print("shape of dataframe: {}".format(df_result.shape))
             
-        #     print(df_result.iloc[0:10,15:26])
-        #     #print(df_result['volume.name'][3:10])
-        #     print("sleep at: {}".format(datetime.datetime.now()))
-        #     time.sleep(3)  #paramter is in SECONDS    
+            print(df_result.iloc[0:10,4:8])
+            #print(df_result['volume.name'][3:10])
+            print("sleep at: {}".format(datetime.datetime.now()))
+            time.sleep(3)  #paramter is in SECONDS    
         
 if __name__ == "__main__":
     main()
