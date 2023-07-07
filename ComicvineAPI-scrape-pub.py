@@ -53,10 +53,7 @@ class ComicvineAPI_scraper:
         #this is the dataFrame that will be exposed to the client code for easy retreival
         self.df_CV = None
         #private attributes:         #Prefixing with '_' indicates it's a private attribute
-        #self._CV_timestamp = None #set to the current time of obj. construction
         self.CV_timestamp = None #set to the current time of obj. construction
-        #self._CV_processed_json = None
-        
         #dict to hold response code and response JSON
         self.attributes_CV_resp = {}
 
@@ -88,7 +85,7 @@ class ComicvineAPI_scraper:
         
     @property 
     def CV_resource(self):
-        #NOTE: add some validation
+        #ACTION: put in a validation
         return self._CV_resource
     
     @CV_resource.setter 
@@ -124,12 +121,10 @@ class ComicvineAPI_scraper:
         #NOTE: add some validation for offset
         #NOTE: you must put an underscore before the instance variable name or else the "getter" will act as a recursive call, throwing a limit error
         self._CV_query_URL = self.build_query_string()
-        #self._CV_query_URL = self.build_query_string()
     
     #not using a property decorator since I do not want to have a getter/setter pair for this "private"
     #https://stackoverflow.com/questions/27396339/attributeerror-cant-set-attribute
     def get_CV_timestamp(self):
-    #    return self._CV_timestamp
         return self.CV_timestamp
        
     #Using properties: You can use the @property decorator to define a getter method 
