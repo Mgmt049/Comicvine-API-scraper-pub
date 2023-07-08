@@ -165,10 +165,10 @@ class ComicvineAPI_scraper:
                     
                     self.attributes_CV_resp["response_JSON"] = json.dumps(CV_resp.json(), indent=4) #populate dict
                      
-                    if not CV_resp:
-                        print("no more results from API call.")
-                        logfile.write(str(datetime.datetime.now()) + " no more results from API call.\n")
-                        sys.exit()
+                    # if not CV_resp:
+                    #     print("no more results from API call.")
+                    #     logfile.write(str(datetime.datetime.now()) + " no more results from API call.\n")
+                    #     sys.exit()
                             
                 else: 
                      print("bad response, write to log file...")
@@ -184,8 +184,8 @@ class ComicvineAPI_scraper:
     def make_request(self):
     #this function is a governor to ensure we don't spam the REST endpoint and get banned
    
-     #ACTION: WRITE EXCEPTIONS TO LOGFILE IN THE ELSE CONDITIONS AND THE EXCEPTS!!!!!    
-     #ACTION: find a way to return the response code!!!
+        #ACTION: WRITE EXCEPTIONS TO LOGFILE IN THE ELSE CONDITIONS AND THE EXCEPTS!!!!!    
+        #ACTION: find a way to return the response code!!!
         with open(self.path_output + self.APIlog_file, "a") as logfile:    
 
             try:             
@@ -223,7 +223,7 @@ class ComicvineAPI_scraper:
         try: 
 
             # You use json.loads to convert a JSON string into Python objects needed  to read nested columns
-            # creating a DataFrame from the normalized JSON
+            # also we are creating a DataFrame from the normalized JSON
             #https://stackoverflow.com/questions/68864871/why-does-pandas-json-normalizejson-results-raise-a-notimplementederror
             
             self.df_CV = pd.json_normalize(json.loads( self.attributes_CV_resp["response_JSON"] ), record_path =['results'],meta=['error', 'limit', 'offset'])
@@ -236,7 +236,6 @@ class ComicvineAPI_scraper:
             
         except Exception as e:
             print("general exception in process_JSON(): {} \n".format(e))
-        
     #end of process_JSON()
 
     def timestamp_df(self):
@@ -266,12 +265,12 @@ class ComicvineAPI_scraper:
         #https://comicvine.gamespot.com/forums/api-developers-2334/paging-through-results-page-or-offset-1450438/
         #The end of the "characters" resource list is around 149150
         CV_sort_offset_string = "&sort=name: asc&offset=%s"%(self.CV_offset)
-        #return self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
         self._CV_query_URL = self.base_endpt + self.CV_resource + self.CV_query_string + self.CV_API_KEY + CV_filter_string + CV_sort_offset_string + self.resp_format
     
     #end of build_query_string()
 
 #end of class ComicvineAPI_scraper
+
 #################################################################################################################
 #################################################################################################################
 #start of client code:    
@@ -318,7 +317,6 @@ class ComicvineAPI_scraper:
 # 
 def write_results(df_full_data, path_output):
     #setup the error log:
-    #with open(GLOBALS["APIlog_file"], mode="a") as err_file:
     with open(path_output + "APIlog_file", mode="a") as err_file:
 
         path_output = path_output + "Comicvine_class.xlsx"        
@@ -355,7 +353,6 @@ def main():
     
         offset = random.randint(1, 100000)
         
-        #print("random number offset: {}".format(offset))
         scraper.CV_offset = offset
         
         #initiate a get() to the API 
@@ -368,15 +365,12 @@ def main():
            
         if(scraper.attributes_CV_resp["response_code"] == 200):       
             write_results(df_result, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\')         
-        
-        #if(df_result is not None):
             
-            print("shape of dataframe: {}".format(df_result.shape))
-            
-            print(df_result.iloc[0:10,4:8])
+            print("shape of dataframe: {}".format(df_result.shape))           
+            print(df_result.iloc[0:10,4:14])
             #print(df_result['volume.name'][3:10])
             print("sleep at: {}".format(datetime.datetime.now()))
-            time.sleep(3)  #paramter is in SECONDS    
+            time.sleep(3)  #parameter is in SECONDS    
         
 if __name__ == "__main__":
     main()
