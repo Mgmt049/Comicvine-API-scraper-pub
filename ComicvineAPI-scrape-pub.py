@@ -69,7 +69,6 @@ class ComicvineAPI_scraper:
     #this type of setter will always be called upon calling __init__()
         if not os.path.exists(path_output):
             raise Exception("the output path provided is invalid, destroying the object")
-#            del(self)
         self._path_output = path_output
 
     #https://towardsdatascience.com/6-approaches-to-validate-class-attributes-in-python-b51cffb8c4ea
@@ -79,13 +78,13 @@ class ComicvineAPI_scraper:
     
     @CV_API_KEY.setter 
     def CV_API_KEY(self, CV_API_KEY):
-        #=======
-        #ACTION: put in a validation
+        #only validation is key length
+        if( len(CV_API_KEY) < 40):
+            raise Exception("API Key is insufficient length, destroying object")
         self._CV_API_KEY = CV_API_KEY
         
     @property 
     def CV_resource(self):
-        #ACTION: put in a validation
         return self._CV_resource
     
     @CV_resource.setter 
@@ -101,7 +100,6 @@ class ComicvineAPI_scraper:
         
     @property 
     def CV_offset(self):
-        #NOTE: add some validation
         return self._CV_offset
     
     @CV_offset.setter 
@@ -118,7 +116,6 @@ class ComicvineAPI_scraper:
     
     @CV_query_URL.setter
     def CV_query_URL(self, CV_offset):
-        #NOTE: add some validation for offset
         #NOTE: you must put an underscore before the instance variable name or else the "getter" will act as a recursive call, throwing a limit error
         self._CV_query_URL = self.build_query_string()
     
@@ -184,8 +181,7 @@ class ComicvineAPI_scraper:
     def make_request(self):
     #this function is a governor to ensure we don't spam the REST endpoint and get banned
    
-        #ACTION: WRITE EXCEPTIONS TO LOGFILE IN THE ELSE CONDITIONS AND THE EXCEPTS!!!!!    
-        #ACTION: find a way to return the response code!!!
+        #ACTION: WRITE EXCEPTIONS TO LOGFILE
         with open(self.path_output + self.APIlog_file, "a") as logfile:    
 
             try:             
@@ -236,13 +232,13 @@ class ComicvineAPI_scraper:
             
         except Exception as e:
             print("general exception in process_JSON(): {} \n".format(e))
+        except pd.NotImplementedError as nie:
+            print("notimplementederror in timestampt_df(): {} \n".format(nie))
     #end of process_JSON()
 
     def timestamp_df(self):
         
-        try:      
-            
-            #ACTION: implement a try-except for NotImplementedError in normalize_df() among other exceptions
+        try:
          
             #grab the current date for timestamping
             formatted_date = datetime.datetime.now()
@@ -253,8 +249,7 @@ class ComicvineAPI_scraper:
     
         except Exception as e:
             print("general exception in timestamp_df(): {} \n".format(e))
-        except pd.notimplementederror as nie:
-            print("notimplementederror in timestampt_df(): {} \n".format(nie))
+
     #end of timestamp_df()
     
     
@@ -347,7 +342,8 @@ def write_results(df_full_data, path_output):
     
 def main():
     
-    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues', 400)
+    #scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues', 400)
+    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','pissues', 400)
     
     for i in range(1, 100):
     
@@ -360,6 +356,8 @@ def main():
         #print(scraper.CV_query_URL)
         
         print("attributes_CV_resp code in client code: {}".format(scraper.attributes_CV_resp["response_code"]))
+        
+        #print("API key length: {}".format(len('f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b')))
                
         df_result = scraper.df_CV
            
@@ -367,7 +365,7 @@ def main():
             write_results(df_result, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\')         
             
             print("shape of dataframe: {}".format(df_result.shape))           
-            print(df_result.iloc[0:10,4:14])
+            print(df_result.iloc[0:10,4:10])
             #print(df_result['volume.name'][3:10])
             print("sleep at: {}".format(datetime.datetime.now()))
             time.sleep(3)  #parameter is in SECONDS    
