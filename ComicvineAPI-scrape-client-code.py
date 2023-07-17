@@ -2,7 +2,8 @@
 #Created on Mon Jan 17 22:40:38 2022
 #Kevin Faterkowski
 
-import ComicvineAPI_scraper
+#import ComicvineAPI_scraper
+import ComicvineAPI-scrape-pub
 import random
 import pandas as pd
 import datetime 
