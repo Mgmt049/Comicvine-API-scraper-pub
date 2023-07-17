@@ -8,10 +8,10 @@ import json
 import sys
 import os #for file path testing
 import datetime
-#import shutil as sh
 import time
 #from XlsxWriter import FileCreateError
 import random
+import xlsxwriter
 
 #############################################################################################
 #PURPOSE:  is to retrive JSON from a ComicVine REST API endpoint and download to Excel records
