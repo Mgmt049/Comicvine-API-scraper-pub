@@ -17,19 +17,9 @@ Project is created with:
 ## Setup
 To run this project, install it
 These libraries are needed
-pd
-requests 
-json 
-sys
-os
-datetime
-time
-random
-xlsxwriter 
 
 
 ```
-These libraries are needed
 pd
 requests 
 json 
