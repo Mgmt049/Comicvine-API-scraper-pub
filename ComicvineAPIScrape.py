@@ -311,64 +311,64 @@ class ComicvineAPI_scraper:
 #     #necessary for re-numbering the index
 #     return pd.concat(dfs, axis=0, ignore_index=True)
 # 
-def write_results(df_full_data, path_output):
-    #setup the error log:
-    with open(path_output + "APIlog_file", mode="a") as err_file:
+# def write_results(df_full_data, path_output):
+#     #setup the error log:
+#     with open(path_output + "APIlog_file", mode="a") as err_file:
 
-        path_output = path_output + "Comicvine_class.xlsx"        
+#         path_output = path_output + "Comicvine_class.xlsx"        
 
-        try:
+#         try:
             
-            #quickly create a backup file
-            #sh.copy2(path_output, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\Comicvine_bak.xlsx')
+#             #quickly create a backup file
+#             #sh.copy2(path_output, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\Comicvine_bak.xlsx')
     
-            #Excel threw a hard limit on 65K+ URLS error, so i had to use Excelwriter() and ingore URLs instead of .toExcel()
-            #https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html
-            #https://stackoverflow.com/questions/55280131/no-module-named-xlsxwriter-error-while-writing-pandas-df-to-excel/55280686
-            #https://stackoverflow.com/questions/71144242/which-arguments-is-futurewarning-use-of-kwargs-is-deprecated-use-engine-kwa
-            with pd.ExcelWriter(path_output, engine='xlsxwriter', engine_kwargs={'options':{'strings_to_urls': False}}) as writer:
-                df_full_data.to_excel(writer)
+#             #Excel threw a hard limit on 65K+ URLS error, so i had to use Excelwriter() and ingore URLs instead of .toExcel()
+#             #https://pandas.pydata.org/docs/reference/api/pandas.ExcelWriter.html
+#             #https://stackoverflow.com/questions/55280131/no-module-named-xlsxwriter-error-while-writing-pandas-df-to-excel/55280686
+#             #https://stackoverflow.com/questions/71144242/which-arguments-is-futurewarning-use-of-kwargs-is-deprecated-use-engine-kwa
+#             with pd.ExcelWriter(path_output, engine='xlsxwriter', engine_kwargs={'options':{'strings_to_urls': False}}) as writer:
+#                 df_full_data.to_excel(writer)
             
-            print("timestamp pulled in write_results() %s"%(datetime.datetime.now()))
+#             print("timestamp pulled in write_results() %s"%(datetime.datetime.now()))
 
-        except FileNotFoundError as e:
-            print("this the FNF error", e)
-            err_file.write("{} this the FNF error {} ".format(datetime.datetime.now(), e) )
-            sys.exit() #terminate the whole program
-        except IOError as io:
-            print("this the IO error: ", io)
-            err_file.write("{} this the IO error {} ".format(datetime.datetime.now(), io) )
-            sys.exit() #terminate the whole program 
+#         except FileNotFoundError as e:
+#             print("this the FNF error", e)
+#             err_file.write("{} this the FNF error {} ".format(datetime.datetime.now(), e) )
+#             sys.exit() #terminate the whole program
+#         except IOError as io:
+#             print("this the IO error: ", io)
+#             err_file.write("{} this the IO error {} ".format(datetime.datetime.now(), io) )
+#             sys.exit() #terminate the whole program 
 
     
-def main():
+# def main():
     
-    scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues', 400)
+#     scraper = ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', 'f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b','issues', 400)
     
-    for i in range(1, 100):
+#     for i in range(1, 100):
     
-        offset = random.randint(1, 100000)
+#         offset = random.randint(1, 100000)
         
-        scraper.CV_offset = offset
+#         scraper.CV_offset = offset
         
-        #initiate a get() to the API 
-        scraper.make_request()
-        #print(scraper.CV_query_URL)
+#         #initiate a get() to the API 
+#         scraper.make_request()
+#         #print(scraper.CV_query_URL)
         
-        print("attributes_CV_resp code in client code: {}".format(scraper.attributes_CV_resp["response_code"]))
+#         print("attributes_CV_resp code in client code: {}".format(scraper.attributes_CV_resp["response_code"]))
         
-        #print("API key length: {}".format(len('f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b')))
+#         #print("API key length: {}".format(len('f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b')))
                
-        df_result = scraper.df_CV
+#         df_result = scraper.df_CV
            
-        if(scraper.attributes_CV_resp["response_code"] == 200):       
-            write_results(df_result, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\')         
+#         if(scraper.attributes_CV_resp["response_code"] == 200):       
+#             write_results(df_result, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\')         
             
-            print("shape of dataframe: {}".format(df_result.shape))           
-            print(df_result.iloc[0:10,4:10])
-            #print(df_result['volume.name'][3:10])
-            print("sleep at: {}".format(datetime.datetime.now()))
-            time.sleep(3)  #parameter is in SECONDS    
+#             print("shape of dataframe: {}".format(df_result.shape))           
+#             print(df_result.iloc[0:10,4:10])
+#             #print(df_result['volume.name'][3:10])
+#             print("sleep at: {}".format(datetime.datetime.now()))
+#             time.sleep(3)  #parameter is in SECONDS    
         
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

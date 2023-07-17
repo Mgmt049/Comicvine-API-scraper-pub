@@ -3,7 +3,7 @@
 #Kevin Faterkowski
 
 #import ComicvineAPI_scraper
-import ComicvineAPI-scrape-pub
+import ComicvineAPIScrape
 import random
 import pandas as pd
 import datetime 
