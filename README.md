@@ -29,8 +29,15 @@ xlsxwriter
 
 
 ```
-$ cd ../lorem
-$ npm install
-$ npm start
+These libraries are needed
+pd
+requests 
+json 
+sys
+os
+datetime
+time
+random
+xlsxwriter 
 ```
 
