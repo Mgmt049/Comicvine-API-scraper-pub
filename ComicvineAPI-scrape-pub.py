@@ -11,7 +11,8 @@ import datetime
 import time
 #from XlsxWriter import FileCreateError
 import random
-import xlsxwriter
+#NOTE: there is a dependency within pandas that may require xlsxwriter in order to write DataFrame to Excel, so include it
+import xlsxwriter 
 
 #############################################################################################
 #PURPOSE:  is to retrive JSON from a ComicVine REST API endpoint and download to Excel records

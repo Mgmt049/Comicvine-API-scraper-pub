@@ -16,9 +16,7 @@ Project is created with:
 
 ## Setup
 To run this project, install it
-These libraries are needed
-
-
+These library depedencies must be installed in your environment
 ```
 pd
 requests 
@@ -31,3 +29,10 @@ random
 xlsxwriter 
 ```
 
+```
+pandas
+datetime
+random
+time
+sys
+```
