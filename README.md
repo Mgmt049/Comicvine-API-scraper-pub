@@ -11,8 +11,19 @@ This project is simple Lorem ipsum dolor generator.
 ## Technologies
 Project was developed with:
 * Python version 3.9.0
-* xxxx
-* xxxx
+* requests 
+* json 
+* sys
+* os
+* datetime
+* time
+* random
+* xlsxwriter
+* pandas
+* datetime
+* random
+* time
+* sys
 
 ## Files
 * <main module>
@@ -22,20 +33,7 @@ Project was developed with:
 To run this project, install it
 These library depedencies must be installed in your environment
 ```
-pd
-requests 
-json 
-sys
-os
-datetime
-time
-random
-xlsxwriter
-pandas
-datetime
-random
-time
-sys
+See Technologies
 ```
 
 ```
