@@ -21,13 +21,7 @@ import xlsxwriter
 #01/07/2022 - initial script creation
 #01/22/2023 - "globalized" constants in process of converting to a Class...
 #############################################################################################
-#Constants to populate before execution:
-#############################################################################################
-##"path_output" - local or network folder/share to store outputs (inc'l log file)
-## "CV_API_KEY" - sign up for comicvine API and paste in your API key
-#############################################################################################
 
-#############################################################################################
 
 class ComicvineAPI_scraper:
 #Class variables:
