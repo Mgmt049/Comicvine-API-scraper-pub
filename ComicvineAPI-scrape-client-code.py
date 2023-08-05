@@ -87,6 +87,7 @@ def main():
     #ACTION: clean up the module name and the class name (redundant)
     scraper = ComicvineAPIScrape.ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', '<API key>','issues', 400)
     
+    #loop through 100 API calls and then report out the return code and pull the responses' data via Pandas dataframe
     for i in range(1, 100):
     
         offset = random.randint(1, 100000)
@@ -99,7 +100,7 @@ def main():
         
         print("attributes_CV_resp code in client code: {}".format(scraper.attributes_CV_resp["response_code"]))
         
-        df_result = scraper.df_CV
+        df_result = scraper.df_CV #this is a return of the API (JSON data) in Pandas Datframe form
            
         if(scraper.attributes_CV_resp["response_code"] == 200):       
             write_results(df_result, 'C:\\Users\\00616891\\Downloads\\CV_API_output\\')         

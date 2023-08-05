@@ -42,5 +42,14 @@ Insert your API key into your object instatiation code as displayed in the examp
 For needed Pythong packages, See Technologies section...
 ```
 To run this project, install ComicvineAPIScrape.py in <project location>\Lib\site-packages
+Notable method calls:
+    scraper = ComicvineAPIScrape.ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', '<API key>','issues', 400)
+	
+	print("attributes_CV_resp code in client code: {}".format(scraper.attributes_CV_resp["response_code"]))
+	
+	scraper.attributes_CV_resp["response_code"] 
+	
+	df_result = scraper.df_CV #this is a return of the API (JSON data) in Pandas Datframe form
+```
 
 
