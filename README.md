@@ -6,11 +6,13 @@ Python script that scrapes Comicvine REST API endpoint to retrive JSON and downl
 * [Setup](#setup)
 
 ## General info
-This project is simple Lorem ipsum dolor generator.
+This project is a small module to hit the GameSpot/Comicvine API and download data from their API endpoint, normalizes/flattens the JSON and returns it via a Python Pandas dataframe.
 	
 ## Technologies
+
 Project was developed with:
 * Python version 3.9.0
+These library depedencies must be installed in your environment
 * requests 
 * json 
 * sys
@@ -30,15 +32,15 @@ Project was developed with:
 * ComicvineAPI-scrape-client-code.py
 
 ## Setup
-To run this project, install ComicvineAPIScrape.py in <project location>\Lib\site-packages
-These library depedencies must be installed in your environment
-```
-See Technologies
-```
-
 ```
 Pre-requisite:
 You must register for an API at gamespot/comicvine...
 Insert your API key into your object instatiation code as displayed in the example ComicvineAPI-scrape-client-code.py: 
 	<example lines...>
 ```
+```
+For needed Pythong packages, See Technologies section...
+```
+To run this project, install ComicvineAPIScrape.py in <project location>\Lib\site-packages
+
+
