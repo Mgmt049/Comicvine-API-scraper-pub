@@ -99,8 +99,6 @@ def main():
         
         print("attributes_CV_resp code in client code: {}".format(scraper.attributes_CV_resp["response_code"]))
         
-        #print("API key length: {}".format(len('f4c0a0d5001a93f785b68a8be6ef86f9831d4b5b')))
-               
         df_result = scraper.df_CV
            
         if(scraper.attributes_CV_resp["response_code"] == 200):       

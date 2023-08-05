@@ -9,8 +9,8 @@ Python script that scrapes Comicvine REST API endpoint to retrive JSON and downl
 This project is simple Lorem ipsum dolor generator.
 	
 ## Technologies
-Project is created with:
-* Python version xxxx
+Project was developed with:
+* Python version 3.9.0
 * xxxx
 * xxxx
 
