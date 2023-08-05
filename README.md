@@ -14,6 +14,10 @@ Project was developed with:
 * xxxx
 * xxxx
 
+## Files
+* <main module>
+* <client code>
+
 ## Setup
 To run this project, install it
 These library depedencies must be installed in your environment
@@ -26,13 +30,17 @@ os
 datetime
 time
 random
-xlsxwriter 
-```
-
-```
+xlsxwriter
 pandas
 datetime
 random
 time
 sys
+```
+
+```
+Pre-requisite:
+You must register for an API at gamespot/comicvine...
+Insert your API key into your object instatiation code as displayed in <client code>: 
+	<example lines...>
 ```
