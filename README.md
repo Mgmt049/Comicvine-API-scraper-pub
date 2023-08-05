@@ -36,11 +36,11 @@ These library depedencies must be installed in your environment
 Pre-requisite:
 You must register for an API at gamespot/comicvine...
 Insert your API key into your object instatiation code as displayed in the example ComicvineAPI-scrape-client-code.py: 
-	<example lines...>
+	ComicvineAPIScrape.ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', '<API key>','issues', 400)
 ```
 ```
 For needed Pythong packages, See Technologies section...
-```
+
 To run this project, install ComicvineAPIScrape.py in <project location>\Lib\site-packages
 Notable method calls:
     scraper = ComicvineAPIScrape.ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', '<API key>','issues', 400)
