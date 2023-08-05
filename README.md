@@ -26,11 +26,11 @@ Project was developed with:
 * sys
 
 ## Files
-* <main module>
-* <client code>
+* ComicvineAPIScrape.py (the class module)
+* ComicvineAPI-scrape-client-code.py
 
 ## Setup
-To run this project, install it
+To run this project, install ComicvineAPIScrape.py in <project location>\Lib\site-packages
 These library depedencies must be installed in your environment
 ```
 See Technologies
@@ -39,6 +39,6 @@ See Technologies
 ```
 Pre-requisite:
 You must register for an API at gamespot/comicvine...
-Insert your API key into your object instatiation code as displayed in <client code>: 
+Insert your API key into your object instatiation code as displayed in the example ComicvineAPI-scrape-client-code.py: 
 	<example lines...>
 ```
