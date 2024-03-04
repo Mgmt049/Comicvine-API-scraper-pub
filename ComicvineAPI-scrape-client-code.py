@@ -9,6 +9,9 @@ import pandas as pd
 import datetime 
 import time
 import sys
+from dotenv import load_dotenv #to manage env variables
+import os
+
 #################################################################################################################
 #start of client code:    
 # def load_previous(dir_output):
@@ -83,12 +86,15 @@ def write_results(df_full_data, path_output):
 
     
 def main():
-    
+    #fetch API key from environment:
+    load_dotenv()
+    api_key=os.environ.get("CV_API_KEY")
+       
     #ACTION: clean up the module name and the class name (redundant)
-    scraper = ComicvineAPIScrape.ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', '<API key>','issues', 400)
+    scraper = ComicvineAPIScrape.ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', api_key,'issues', 400)
     
     #loop through 100 API calls and then report out the return code and pull the responses' data via Pandas dataframe
-    for i in range(1, 100):
+    for i in range(1, 200):
     
         offset = random.randint(1, 100000)
         
