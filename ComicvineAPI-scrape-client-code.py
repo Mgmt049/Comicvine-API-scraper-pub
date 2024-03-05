@@ -94,8 +94,7 @@ def main():
     scraper = ComicvineAPIScrape.ComicvineAPI_scraper('C:\\Users\\00616891\\Downloads\\CV_API_output\\', api_key,'issues', 400)
     
     #loop through 100 API calls and then report out the return code and pull the responses' data via Pandas dataframe
-    for i in range(1, 200):
-    
+    for i in range(1, 20):
         offset = random.randint(1, 100000)
         
         scraper.CV_offset = offset
